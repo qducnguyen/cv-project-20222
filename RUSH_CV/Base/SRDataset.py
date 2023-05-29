@@ -38,8 +38,10 @@ class SRDataset(Dataset):
         """
         self.data_npy = np.load(self.data_npy_path)
 
-    def pre_scale_img(self, img, scale):
-        return cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
+    def pre_scale_img(self, img, img_tar, scale):
+        if img_tar is None:
+            return cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
+        return cv2.resize(img, img_tar.shape[:2][::-1], interpolation=cv2.INTER_CUBIC)
 
     def get_patch(self, *args, patch_size, scale):
         ih, iw = args[0].shape[:2]
@@ -55,7 +57,7 @@ class SRDataset(Dataset):
         lr_result = args[0][iy:iy + ip, ix:ix + ip, :]
 
         if self.is_pre_scale:
-            lr_result = self.pre_scale_img(lr_result, self.scale)
+            lr_result = self.pre_scale_img(lr_result, None, self.scale)
               
         ret = [
             lr_result,
@@ -90,7 +92,7 @@ class SRDataset(Dataset):
 
         else:
             if self.is_pre_scale:
-                img_in = self.pre_scale_img(img_in, self.scale)
+                img_in = self.pre_scale_img(img_in, img_tar, self.scale)
 
             else:
                 ih, iw = img_in.shape[:2]
