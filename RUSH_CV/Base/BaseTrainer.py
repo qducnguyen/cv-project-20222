@@ -56,7 +56,7 @@ class BaseTrainer():
     def init_model(self, *args, **kwargs):
         if self.device is None:
             self.device = 'cpu'
-        if self.device is not 'cpu':
+        if self.device != 'cpu':
             torch.cuda.set_device(self.device)
         
         logging.debug("You are training on " + str(self.device))
@@ -90,7 +90,6 @@ class BaseTrainer():
 
     def fit_batch_loop(self, *args, **kwargs):
         for idx, X, Y in tqdm(self.train_dataloader):
-
             self.start_fit_batch()
             idx = to_device(idx, self.device)
             X = to_device(X, self.device)
@@ -141,7 +140,7 @@ class BaseTrainer():
         return self.performance
 
     @torch.no_grad()
-    def start_predict(self, eval, *args, **kwargs):
+    def start_predict(self, valid, *args, **kwargs):
 
         if self.evaluation is not None:
             if isinstance(self.evaluation,(list,tuple)):

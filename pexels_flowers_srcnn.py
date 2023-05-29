@@ -19,10 +19,6 @@ from RUSH_CV.Trainer.CNNTrainer import CNNTrainer
 
 # pp.add_argument('--data-npy-path',  type=str, default="pexels_flowers_train")
 
-
-
-
-
 def main():
 
     # Seed everything
@@ -34,25 +30,25 @@ def main():
     # Data
 
     train_dataset = PexelsFlowers(data_np_path='data/preprocess/pexels_flowers_train_x4.npy',
-                                    patch_size=33,
+                                    patch_size=64,
                                     is_train=True,
                                     is_pre_scale=True,
                                     scale=4)
     
     valid_dataset = PexelsFlowers(data_np_path='data/preprocess/pexels_flowers_valid_x4.npy',
-                                   patch_size=33,
+                                   patch_size=64,
                                     is_train=False,
                                     is_pre_scale=True,
                                     scale=4)
     
     test_dataset = PexelsFlowers('data/preprocess/pexels_flowers_test_x4.npy',
-                                   patch_size=33,
+                                   patch_size=64,
                                     is_train=False,
                                     is_pre_scale=True,
                                     scale=4)
 
     train_dataloader = DataLoader(train_dataset,
-                                  batch_size=2,
+                                  batch_size=8,
                                   shuffle=True,
                                   num_workers=4,
                                   pin_memory=True,
@@ -72,7 +68,7 @@ def main():
     network = SRCNN()
 
     # Loss
-    loss = MSELoss()
+    criterion = MSELoss()
 
     # Optimizer 
     optimizer = Adam([
@@ -93,7 +89,7 @@ def main():
                          valid_dataloader=valid_dataloader,
                          test_dataloader=test_dataloader,
                          network=network,
-                         loss=loss,
+                         criterion=criterion,
                          optimizer=optimizer,
                          scheduler=None,
                          device=device,

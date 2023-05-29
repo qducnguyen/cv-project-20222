@@ -9,7 +9,7 @@ class CNNTrainer(BaseTrainer):
                  valid_dataloader,
                  test_dataloader,
                  network,
-                 loss,
+                 criterion,
                  optimizer,
                  scheduler=None,
                  device=None,
@@ -29,7 +29,7 @@ class CNNTrainer(BaseTrainer):
                             num_epoch=num_epoch,
                             eval_epoch=eval_epoch)
 
-        self.loss = loss
+        self.criteration = criterion
 
     def train(self, idx, X, Y, *args, **kwargs):
         
@@ -41,7 +41,7 @@ class CNNTrainer(BaseTrainer):
 
     def get_loss(self, train_result, *args, **kwargs):
         logits, preds, Y = train_result
-        loss = self.loss(preds, Y)
+        loss = self.criteration(preds, Y)
         return loss
 
     @torch.no_grad()

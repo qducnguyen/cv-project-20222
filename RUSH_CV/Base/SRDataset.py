@@ -64,7 +64,7 @@ class SRDataset(Dataset):
 
         return ret
 
-    def augment(*args, hflip=True, rot=True):
+    def augment(self, *args, hflip=True, rot=True):
         hflip = hflip and random.random() < 0.5
         vflip = rot and random.random() < 0.5
         rot90 = rot and random.random() < 0.5
@@ -85,10 +85,16 @@ class SRDataset(Dataset):
         if self.is_train:
             img_in, img_tar = self.get_patch(
                 img_in, img_tar, patch_size=patch_size, scale=scale)
+            
             img_in, img_tar = self.augment(img_in, img_tar)
+
         else:
-            ih, iw = img_in.shape[:2]
-            img_tar = img_tar[0:ih * scale, 0:iw * scale, :]
+            if self.is_pre_scale:
+                img_in = self.pre_scale_img(img_in, self.scale)
+
+            else:
+                ih, iw = img_in.shape[:2]
+                img_tar = img_tar[0:ih * scale, 0:iw * scale, :]
             
         return img_in, img_tar
 
@@ -138,7 +144,7 @@ class SRDataset(Dataset):
         X_channel, Y_channel = self.set_channel(X_patch, Y_patch)
         X, Y = self.np2Tensor(X_channel, Y_channel)
 
-        return idx, X, Y, X_patch, Y_patch, X_channel, Y_channel
+        return idx, X, Y
     
 
     def __len__(self):
