@@ -1,28 +1,51 @@
-from tqdm.auto import tqdm
+import torch
 
-from RUSH_CV.Base.Trainer import Trainer
+from RUSH_CV.Base.BaseTrainer import BaseTrainer
 
 
-class CNNTrainer(Trainer):
+class CNNTrainer(BaseTrainer):
     def __init__(self, 
-                 network, 
-                 train_dataset, 
-                 valid_dataset, 
-                 test_dataset,
-                 num_epoch):
+                 train_dataloader,
+                 valid_dataloader,
+                 test_dataloader,
+                 network,
+                 loss,
+                 optimizer,
+                 scheduler=None,
+                 device=None,
+                 evaluation=None,
+                 num_epoch=10,
+                 eval_epoch=1):
         
-        Trainer.__init__(self,
-                         network=network,
-                         train_dataset=train_dataset,
-                         valid_dataset=valid_dataset,
-                         test_dataset=test_dataset,
-                         num_epoch=num_epoch)
+        BaseTrainer.__init__(self,
+                            train_dataloader=train_dataloader,
+                            valid_dataloader=valid_dataloader,
+                            test_dataloader=test_dataloader,
+                            network=network,
+                            optimizer=optimizer,
+                            scheduler=scheduler,
+                            device=device,
+                            evaluation=evaluation,
+                            num_epoch=num_epoch,
+                            eval_epoch=eval_epoch)
+
+        self.loss = loss
+
+    def train(self, idx, X, Y, *args, **kwargs):
+        
+        logits = self.network(X)
+        preds = logits
+
+        return logits, preds, Y
 
 
-    def fit(self):
-        pass
+    def get_loss(self, train_result, *args, **kwargs):
+        logits, preds, Y = train_result
+        loss = self.loss(preds, Y)
+        return loss
 
-    def eval(self, valid=False):
-        pass
-
+    @torch.no_grad()
+    def predict_batch(self, idx, X, Y, *args, **kwargs):
+        preds = self.network(X).clamp(0.0, 1.0)
+        return preds
     
