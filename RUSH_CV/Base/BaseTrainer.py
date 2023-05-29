@@ -47,7 +47,6 @@ class BaseTrainer():
     def fit(self, *args, **kwargs):
         if self.network is not None:
             self.init_model()
-
         self.start_fit()
         self.fit_epoch_loop()
         self.end_fit()
@@ -59,7 +58,7 @@ class BaseTrainer():
         if self.device != 'cpu':
             torch.cuda.set_device(self.device)
         
-        logging.debug("You are training on " + str(self.device))
+        logging.info("Training on " + str(self.device))
 
         self.network = self.network.to(self.device)
 
@@ -128,6 +127,7 @@ class BaseTrainer():
     @torch.no_grad()
     def evaluate(self, valid=False):
 
+
         self.performance =self.predict(valid=valid)
 
         return self.performance
@@ -142,6 +142,8 @@ class BaseTrainer():
     @torch.no_grad()
     def start_predict(self, valid, *args, **kwargs):
 
+        self.network.eval()
+
         if self.evaluation is not None:
             if isinstance(self.evaluation,(list,tuple)):
                 for eval in self.evaluation:
@@ -152,7 +154,6 @@ class BaseTrainer():
             else:
                 self.evaluation.reset()
 
-        self.network.eval()
 
     @torch.no_grad()
     def predict_batch_loop(self, valid):
@@ -185,13 +186,15 @@ class BaseTrainer():
                 for key , val in self.evaluation.items():
                     performance[key] = val()
             else:
-                performance = self.evaluate()   
+                performance = self.evaluation()   
 
         self.network.train()
 
-        logging.debug(performance)
 
-        return performance
+        logging.info(performance)
+
+        self.performance = performance
+        return self.performance
 
     @torch.no_grad()
     def start_predict_batch(self, *args, **kwargs):
