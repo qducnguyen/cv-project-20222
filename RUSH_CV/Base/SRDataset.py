@@ -21,7 +21,8 @@ class SRDataset(Dataset):
                  patch_size, 
                  is_train, 
                  is_pre_scale, 
-                 scale):
+                 scale,
+                 is_debug=False):
 
         self.IMG_EXTENSIONS = ['.png']
         self.data_npy_path = data_np_path
@@ -29,6 +30,7 @@ class SRDataset(Dataset):
         self.is_train = is_train
         self.scale = scale
         self.is_pre_scale = is_pre_scale
+        self.is_debug = is_debug
 
         self.init_dataset()
 
@@ -37,6 +39,20 @@ class SRDataset(Dataset):
         Running when starting fitting the model
         """
         self.data_npy = np.load(self.data_npy_path)
+
+        if self.is_debug and self.is_train:
+            len_data = self.data_npy.shape[0]
+            if len_data < 50:
+                # Get 25%
+                logging.warning("Your training dataset is too small (less than 50). Getting 25\% of this dataset.")
+                get_data_size = int(0.25 * len_data)
+            else:
+                get_data_size = 50
+
+            logging.info(f"Getting {get_data_size} samples from training set for debug mode")
+
+            self.data_npy = self.data_npy[:get_data_size]        
+
 
     def pre_scale_img(self, img, img_tar, scale):
         if img_tar is None:

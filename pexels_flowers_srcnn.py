@@ -2,6 +2,8 @@ import yaml
 import argparse
 import logging
 
+from utils import str2bool
+
 from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
@@ -14,10 +16,12 @@ from RUSH_CV.Evaluation.PSNR import PSNR
 
 from RUSH_CV.Trainer.CNNTrainer import CNNTrainer
 
-# DEBUG
-# pp = argparse.ArgumentParser(description="Testing")
+pp = argparse.ArgumentParser(description="Testing")
 
-# pp.add_argument('--data-npy-path',  type=str, default="pexels_flowers_train")
+pp.add_argument('--debug', type=str2bool, default=False)
+
+args = pp.parse_args()
+
 
 def main():
 
@@ -33,7 +37,8 @@ def main():
                                     patch_size=64,
                                     is_train=True,
                                     is_pre_scale=True,
-                                    scale=4)
+                                    scale=4,
+                                    is_debug=args.debug)
     
     valid_dataset = PexelsFlowers(data_np_path='data/preprocess/pexels_flowers_valid_x4.npy',
                                    patch_size=64,
@@ -43,9 +48,9 @@ def main():
     
     test_dataset = PexelsFlowers('data/preprocess/pexels_flowers_test_x4.npy',
                                    patch_size=64,
-                                    is_train=False,
-                                    is_pre_scale=True,
-                                    scale=4)
+                                   is_train=False,
+                                   is_pre_scale=True,
+                                   scale=4)
 
     train_dataloader = DataLoader(train_dataset,
                                   batch_size=4,
@@ -66,7 +71,6 @@ def main():
 
     # Network
     network = SRCNN()
-
     # Loss
     criterion = MSELoss()
 
@@ -84,7 +88,6 @@ def main():
     num_epoch = 2
     eval_epoch = 1
 
-
     trainer = CNNTrainer(train_dataloader=train_dataloader,
                          valid_dataloader=valid_dataloader,
                          test_dataloader=test_dataloader,
@@ -100,6 +103,7 @@ def main():
 
     trainer.fit()
 
+    logging.info("Evaluation on test set ...")
     test_performance = trainer.evaluate(valid=False)
 
     logging.info(test_performance)
