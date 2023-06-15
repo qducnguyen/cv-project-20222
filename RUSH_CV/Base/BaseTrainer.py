@@ -2,8 +2,9 @@ import logging
 from tqdm.auto import tqdm
 
 import torch
+from RUSH_CV.utils import to_device, RunningAverage
 
-from RUSH_CV.utils import to_device
+
 
 
 class BaseTrainer():
@@ -43,6 +44,8 @@ class BaseTrainer():
         self.loss = None
         self.performance = None
         self.estimate_dataloader = None
+
+        self.loss_tracking = RunningAverage()
 
     def fit(self, *args, **kwargs):
         if self.network is not None:
@@ -88,18 +91,22 @@ class BaseTrainer():
         pass
 
     def fit_batch_loop(self, *args, **kwargs):
-        for idx, X, Y in tqdm(self.train_dataloader):
-            self.start_fit_batch()
-            idx = to_device(idx, self.device)
-            X = to_device(X, self.device)
-            Y = to_device(Y, self.device)
+        with tqdm(total=len(self.train_dataloader)) as t:
+            for idx, X, Y in self.train_dataloader:
+                self.start_fit_batch()
+                idx = to_device(idx, self.device)
+                X = to_device(X, self.device)
+                Y = to_device(Y, self.device)
 
-            train_result = self.train(idx=idx, X=X, Y=Y)
+                train_result = self.train(idx=idx, X=X, Y=Y)
 
-            self.end_fit_batch(train_result)
+                self.end_fit_batch(train_result)
 
-            self.it_total += 1
-            self.it_epoch += 1
+                self.it_total += 1
+                self.it_epoch += 1
+            
+                t.set_postfix(loss=self.loss_tracking())
+                t.update()
 
     def end_fit_epoch(self, *args, **kwargs):
         pass
@@ -113,6 +120,8 @@ class BaseTrainer():
     def end_fit_batch(self, train_result,*args, **kwargs):
         self.loss = self.get_loss(train_result)
         self.optimize(self.loss)
+
+        self.loss_tracking.update(self.loss.detach().cpu().item())
 
     def get_loss(self,train_result,*args,**kwargs):
         raise NotImplementedError
@@ -159,17 +168,20 @@ class BaseTrainer():
     def predict_batch_loop(self, valid):
         self.estimate_dataloader = self.valid_dataloader if valid else self.test_dataloader
         with torch.no_grad():
-            for idx, X, Y in tqdm(self.estimate_dataloader):
-                self.start_predict_batch()
+            with tqdm(total=len(self.estimate_dataloader)) as t:
+                for idx, X, Y in tqdm(self.estimate_dataloader):
+                    self.start_predict_batch()
 
-                idx = to_device(idx, self.device)
-                X = to_device(X, self.device)
-                Y = to_device(Y, self.device)
+                    idx = to_device(idx, self.device)
+                    X = to_device(X, self.device)
+                    Y = to_device(Y, self.device)
 
-                Y_pred = self.predict_batch(idx=idx, X=X, Y=Y)
-                self.get_evaluation(idx=idx, X=X, Y=Y, Y_pred=Y_pred)
+                    Y_pred = self.predict_batch(idx=idx, X=X, Y=Y)
+                    self.get_evaluation(idx=idx, X=X, Y=Y, Y_pred=Y_pred)
 
-                self.end_predict_batch()
+                    self.end_predict_batch()
+
+                    t.update()
 
     @torch.no_grad()
     def end_predict(self, valid, *args, **kwargs):

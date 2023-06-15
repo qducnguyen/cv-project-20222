@@ -2,19 +2,24 @@
 ---
 ## Overview
 
-## Dataset Preparation
+## Colab: Currently, this temporary using this notebook for testing our code:
+```
+https://colab.research.google.com/drive/1FUUh2Sav1IhfKmKPvRKROXAq_9bBBp6A?usp=sharing
+```
 
 ## Installation 
+
+## Dataset Preparation: Please 
 
 ## Team Members
 
 ## Todo
 
-- [ ] Dataset Class
+- [x] Dataset Class
 - [ ] Read me download dataset, setting the dataset
 - [ ] Using yaml config file
-- [ ] Model Class
-- [ ] Debug mode
+- [x] Model Class
+- [x] Debug mode
 - [ ] Save run, resume run
 - [ ] Logging
 - [ ] Training
