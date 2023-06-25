@@ -2,10 +2,7 @@ import logging
 from tqdm.auto import tqdm
 
 import torch
-from RUSH_CV.utils import to_device, RunningAverage
-
-
-
+from RUSH_CV.utils import to_device, RunningAverage, save_checkpoint, load_checkpoint
 
 class BaseTrainer():
 
@@ -20,6 +17,8 @@ class BaseTrainer():
                  evaluation=None,
                  num_epoch=10,
                  eval_epoch=1,
+                 key_metric=None,
+                 ckp_dir=None,
                  ):
         
         self.train_dataloader = train_dataloader
@@ -33,6 +32,9 @@ class BaseTrainer():
         self.device = device
 
         self.evaluation = evaluation
+
+        assert self.evaluation is None or isinstance(self.evaluation, dict), "evaluation variable should be None or a dict instance"
+
         self.num_epoch = num_epoch
         self.eval_epoch = eval_epoch
 
@@ -45,7 +47,13 @@ class BaseTrainer():
         self.performance = None
         self.estimate_dataloader = None
 
+        self.ckp_dir = ckp_dir
+
         self.loss_tracking = RunningAverage()
+
+        self.best_value_key_metric = 0
+        self.key_metric = key_metric
+        self.is_best_model = False
 
     def fit(self, *args, **kwargs):
         if self.network is not None:
@@ -67,19 +75,28 @@ class BaseTrainer():
 
 
     def start_fit(self, *args, **kwargs):
+        # Settings key_metrics
+        if self.evaluation is not None:
+            if self.key_metric is None or self.key_metric not in self.evaluation:
+                self.key_metric = self.evaluation.keys()[-1]
+            
+            logging.info(f"Choose {self.key_metric} as the key metric.")
+
         self.network.zero_grad()
         self.network.train()
 
     def fit_epoch_loop(self, *args, **kwargs):
-        self.it_total = 0
+        self.best_value_key_metric = 0
+
         for self._epoch in range(1, self.num_epoch+1):
             self.it_epoch=0
             self.start_fit_epoch()
             self.fit_batch_loop()
             self.end_fit_epoch()
-
+            
             if self.eval_epoch is not None and self._epoch % self.eval_epoch==0:
                 self.evaluate(valid=True)
+
 
         if self.eval_epoch is None or self.num_epoch % self.eval_epoch !=0 :
             self.evaluate(valid=True)
@@ -88,7 +105,8 @@ class BaseTrainer():
         pass
 
     def start_fit_epoch(self, *args, **kwargs):
-        pass
+        self.is_best_model = False        
+
 
     def fit_batch_loop(self, *args, **kwargs):
         with tqdm(total=len(self.train_dataloader)) as t:
@@ -104,13 +122,14 @@ class BaseTrainer():
 
                 self.it_total += 1
                 self.it_epoch += 1
-            
+
                 t.set_postfix(loss=self.loss_tracking())
                 t.update()
 
     def end_fit_epoch(self, *args, **kwargs):
         pass
-
+        
+           
     def start_fit_batch(self, *args, **kwargs):
         pass
 
@@ -136,8 +155,29 @@ class BaseTrainer():
     @torch.no_grad()
     def evaluate(self, valid=False):
 
-
         self.performance =self.predict(valid=valid)
+
+        if valid:
+            # key metric
+            key_metric_value = self.performance[self.key_metric]
+            if key_metric_value > self.best_value_key_metric:
+                self.best_value_key_metric = key_metric_value
+                self.is_best_model = True
+
+                logging.info(f"New best performance on {self.key_metric} : {self.best_value_key_metric}")
+
+
+            if self.ckp_dir:
+                save_checkpoint(
+                    epoch=self._epoch,
+                    current_it_epoch=self.it_epoch,
+                    current_it_total=self.it_total,
+                    total_epoch=self.num_epoch,
+                    model=self.network,
+                    optimizer=self.optimizer,
+                    is_best=self.is_best_model,
+                    checkpoint_path=self.ckp_dir)
+
 
         return self.performance
 
@@ -154,15 +194,8 @@ class BaseTrainer():
         self.network.eval()
 
         if self.evaluation is not None:
-            if isinstance(self.evaluation,(list,tuple)):
-                for eval in self.evaluation:
-                    eval.reset()
-            elif isinstance(self.evaluation,dict):
-                for _ , val in self.evaluation.items():
-                    val.reset()
-            else:
-                self.evaluation.reset()
-
+            for _ , val in self.evaluation.items():
+                val.reset()
 
     @torch.no_grad()
     def predict_batch_loop(self, valid):
@@ -223,17 +256,15 @@ class BaseTrainer():
         Y_pred = Y_pred.detach().cpu().numpy()
 
         if self.evaluation is not None:
-            if isinstance(self.evaluation,(list,tuple)):
-                for eval in self.evaluation:
-                    eval.update(Y, Y_pred)  
-            elif isinstance(self.evaluation,dict):
-                for _ , val in self.evaluation.items():
-                    val.update(Y, Y_pred)
-            else:
-                self.evaluation.update(Y, Y_pred)       
+            for _ , val in self.evaluation.items():
+                val.update(Y, Y_pred)
 
     @torch.no_grad()
     def end_predict_batch(self, *args, **kwargs):
         pass
+
+    @torch.no_grad()
+    def load_checkpoint(self, checkpoint_path):
+        load_checkpoint(checkpoint_path, self.network)
     
 
