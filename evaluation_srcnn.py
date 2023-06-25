@@ -17,6 +17,7 @@ from RUSH_CV.Trainer.CNNTrainer import CNNTrainer
 pp = argparse.ArgumentParser(description="Evaluation mode")
 
 pp.add_argument("--ckp_dir", type=str, default="./ckp/")
+pp.add_argument("--scale", type=int, default=4)
 
 args = pp.parse_args()
 
@@ -26,17 +27,17 @@ def main():
 
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
-    valid_dataset = PexelsFlowers('data/preprocess/pexels_flowers_valid_x4.npy',
+    valid_dataset = PexelsFlowers(f'data/preprocess/pexels_flowers_valid_x{args.scale}.npy',
                                    patch_size=None,
                                     is_train=False,
                                     is_pre_scale=True,
-                                    scale=4)
+                                    scale=args.scale)
     
-    test_dataset = PexelsFlowers('data/preprocess/pexels_flowers_test_x4.npy',
+    test_dataset = PexelsFlowers(f'data/preprocess/pexels_flowers_test_x{args.scale}.npy',
                                    patch_size=None,
                                    is_train=False,
                                    is_pre_scale=True,
-                                   scale=4)
+                                   scale=args.scale)
 
     valid_dataloader = DataLoader(valid_dataset,
                                   batch_size=1,
