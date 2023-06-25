@@ -109,7 +109,7 @@ class BaseTrainer():
 
 
     def fit_batch_loop(self, *args, **kwargs):
-        with tqdm(total=len(self.train_dataloader)) as t:
+        with tqdm(total=len(self.train_dataloader), desc= f"Epoch {self._epoch}/{self.num_epoch}: ") as t:
             for idx, X, Y in self.train_dataloader:
                 self.start_fit_batch()
                 idx = to_device(idx, self.device)
@@ -202,7 +202,7 @@ class BaseTrainer():
         self.estimate_dataloader = self.valid_dataloader if valid else self.test_dataloader
         with torch.no_grad():
             with tqdm(total=len(self.estimate_dataloader)) as t:
-                for idx, X, Y in tqdm(self.estimate_dataloader):
+                for idx, X, Y in self.estimate_dataloader:
                     self.start_predict_batch()
 
                     idx = to_device(idx, self.device)
@@ -222,16 +222,9 @@ class BaseTrainer():
         if self.evaluation is None:
             performance = None
         else:
-            if isinstance(self.evaluation,(list,tuple)):
-                performance = []
-                for eval in self.evaluation:
-                    performance.append(eval())  
-            elif isinstance(self.evaluation,dict):
-                performance = {}
-                for key , val in self.evaluation.items():
-                    performance[key] = val()
-            else:
-                performance = self.evaluation()   
+            performance = {}
+            for key , val in self.evaluation.items():
+                performance[key] = val()
 
         self.network.train()
 
