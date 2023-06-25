@@ -1,4 +1,5 @@
 import yaml
+import os
 import argparse
 import logging
 
@@ -8,17 +9,16 @@ from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
 from RUSH_CV.Network.SRCNN import SRCNN
-
 from RUSH_CV.Loss.MSELoss import MSELoss
 from RUSH_CV.Optimizer.Adam import Adam
-
 from RUSH_CV.Evaluation.PSNR import PSNR
-
 from RUSH_CV.Trainer.CNNTrainer import CNNTrainer
 
 pp = argparse.ArgumentParser(description="Testing")
 
-pp.add_argument('--debug', type=str2bool, default=False)
+pp.add_argument("--debug", type=str2bool, default=False)
+pp.add_argument("--key_metric", type=str, default="PSNR")
+pp.add_argument("--ckp_dir", type=str, default="./ckp/")
 
 args = pp.parse_args()
 
@@ -32,7 +32,6 @@ def main():
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
     # Data
-
     train_dataset = PexelsFlowers(data_np_path='data/preprocess/pexels_flowers_train_x4.npy',
                                     patch_size=64,
                                     is_train=True,
@@ -44,9 +43,10 @@ def main():
                                    patch_size=64,
                                     is_train=False,
                                     is_pre_scale=True,
-                                    scale=4)
+                                    scale=4,
+                                    is_debug=args.debug)
     
-    test_dataset = PexelsFlowers('data/preprocess/pexels_flowers_test_x4.npy',
+    test_dataset = PexelsFlowers(data_np_path='data/preprocess/pexels_flowers_test_x4.npy',
                                    patch_size=64,
                                    is_train=False,
                                    is_pre_scale=True,
@@ -82,7 +82,7 @@ def main():
     ], lr=1e-4)
 
     # Evaluation
-    evaluation = PSNR()
+    evaluation = {"PSNR": PSNR()} # Dictionary  must be
 
     device = 0
     num_epoch = 2
@@ -98,15 +98,20 @@ def main():
                          device=device,
                          evaluation=evaluation,
                          num_epoch=num_epoch,
-                         eval_epoch=eval_epoch)
+                         eval_epoch=eval_epoch,
+                         key_metric=args.key_metric,
+                         ckp_dir=args.ckp_dir)
 
 
     trainer.fit()
 
+    logging.info("-" * 20)
+    trainer.load_checkpoint(os.path.join(args.ckp_dir, "best.pth"))    
     logging.info("Evaluation on test set ...")
     test_performance = trainer.evaluate(valid=False)
+    logging.info("-" * 20)
 
-    logging.info(test_performance)
+    logging.info(f"Test performance: {test_performance}")
 
 
 if __name__ == '__main__':

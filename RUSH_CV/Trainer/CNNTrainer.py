@@ -15,7 +15,9 @@ class CNNTrainer(BaseTrainer):
                  device=None,
                  evaluation=None,
                  num_epoch=10,
-                 eval_epoch=1):
+                 eval_epoch=1,
+                 key_metric=None,
+                 ckp_dir=None):
         
         BaseTrainer.__init__(self,
                             train_dataloader=train_dataloader,
@@ -27,7 +29,9 @@ class CNNTrainer(BaseTrainer):
                             device=device,
                             evaluation=evaluation,
                             num_epoch=num_epoch,
-                            eval_epoch=eval_epoch)
+                            eval_epoch=eval_epoch,
+                            key_metric=key_metric,
+                            ckp_dir=ckp_dir)
 
         self.criterion = criterion
 

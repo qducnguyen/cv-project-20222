@@ -40,24 +40,37 @@ class SRDataset(Dataset):
         """
         self.data_npy = np.load(self.data_npy_path)
 
-        if self.is_debug and self.is_train:
-            len_data = self.data_npy.shape[0]
-            if len_data < 50:
-                # Get 25%
-                logging.warning("Your training dataset is too small (less than 50). Getting 25\% of this dataset.")
-                get_data_size = int(0.25 * len_data)
+        if self.is_debug:
+            if self.is_train:
+                len_data = self.data_npy.shape[0]
+                if len_data < 50:
+                    # Get 25%
+                    logging.warning("Your training dataset is too small (less than 50). Getting 25\% of this dataset.")
+                    get_data_size = int(0.25 * len_data)
+                else:
+                    get_data_size = 50
+
+                logging.info(f"Getting {get_data_size} samples from training set for debug mode")
+
+                self.data_npy = self.data_npy[:get_data_size]  
             else:
-                get_data_size = 50
+                # Just get 10 images for evaluation in debug mode 
+                len_data = self.data_npy.shape[0]
+                if len_data < 10:
+                    # Get 25%
+                    logging.warning("Your evaluation dataset is too small (less than 10). Getting 25\% of this dataset.")
+                    get_data_size = int(0.25 * len_data)
+                else:
+                    get_data_size = 10
 
-            logging.info(f"Getting {get_data_size} samples from training set for debug mode")
+                logging.info(f"Getting {get_data_size} samples from evaluation set for debug mode")
 
-            self.data_npy = self.data_npy[:get_data_size]        
+                self.data_npy = self.data_npy[:get_data_size]  
 
 
-    def pre_scale_img(self, img, img_tar, scale):
-        if img_tar is None:
-            return cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
-        return cv2.resize(img, img_tar.shape[:2][::-1], interpolation=cv2.INTER_CUBIC)
+
+    def pre_scale_img(self, img, scale):
+        return cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
 
     def get_patch(self, *args, patch_size, scale):
         ih, iw = args[0].shape[:2]
@@ -73,7 +86,7 @@ class SRDataset(Dataset):
         lr_result = args[0][iy:iy + ip, ix:ix + ip, :]
 
         if self.is_pre_scale:
-            lr_result = self.pre_scale_img(lr_result, None, self.scale)
+            lr_result = self.pre_scale_img(lr_result, self.scale)
               
         ret = [
             lr_result,
@@ -108,7 +121,7 @@ class SRDataset(Dataset):
 
         else:
             if self.is_pre_scale:
-                img_in = self.pre_scale_img(img_in, img_tar, self.scale)
+                img_in = self.pre_scale_img(img_in, self.scale)
 
             else:
                 ih, iw = img_in.shape[:2]

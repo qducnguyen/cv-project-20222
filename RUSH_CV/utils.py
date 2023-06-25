@@ -1,5 +1,7 @@
 import random, os
 import numpy as np
+import shutil
+import logging
 import torch
 from torch.nn.utils.rnn import PackedSequence
 
@@ -44,3 +46,85 @@ class RunningAverage():
 
     def __call__(self):
         return self.total / float(self.steps) 
+    
+def save_checkpoint(epoch,
+                    current_it_epoch,
+                    current_it_total,
+                    total_epoch,
+                    model,
+                    optimizer,
+                    is_best,
+                    checkpoint_path,
+                    scheduler=None):
+    """Saves model and training parameters at checkpoint + 'last.pth'. If is_best==True, also saves
+    checkpoint + 'best.pth'
+    """
+
+    state = {'epoch': epoch,
+             'current_it_epoch': current_it_epoch,
+             'current_it_total': current_it_total,
+             'total_epoch': total_epoch,
+             'state_dict': model.state_dict(),
+             'optimizer': optimizer.state_dict(),
+             'scheduler': scheduler.state_dict() if scheduler else None,
+             }
+
+    logging.info(f"Saving checkpoint...")
+
+    file_path = os.path.join(checkpoint_path, 'last.pth')
+
+    if not os.path.exists(checkpoint_path):
+        logging.info("Checkpoint does not exist! Making directory {}".format(checkpoint_path))
+        os.makedirs(checkpoint_path)
+    elif os.path.exists(checkpoint_path) and not is_best:
+        logging.info("Checkpoint {} does exist!. Override the checkpoint ...".format(file_path))
+
+    torch.save(state, file_path)
+
+    if is_best:
+        file_path_best = os.path.join(checkpoint_path, 'best.pth')
+        if os.path.isfile(file_path_best):
+            logging.info("Checkpoint {} does exist!. Override the checkpoint ...".format(
+                file_path_best))
+
+        shutil.copyfile(file_path, os.path.join(checkpoint_path, 'best.pth'))
+
+
+def load_checkpoint(checkpoint, model, optimizer=None, scheduler=None):
+    """Loads model parameters (state_dict) from file_path. If optimizer is provided, loads state_dict of
+    optimizer assuming it is present in checkpoint.
+    Args:
+        checkpoint: (string) filename which needs to be loaded
+        model: (torch.nn.Module) model for which the parameters are loaded
+        optimizer: (torch.optim) optional: resume optimizer from checkpoint
+    """
+
+    if not os.path.exists(checkpoint):
+        raise("File doesn't exist {}".format(checkpoint))
+
+    logging.info(f"Load checkpoint from {checkpoint}")
+
+    checkpoint = torch.load(checkpoint)
+
+    # Load model
+    model.load_state_dict(checkpoint['state_dict'])  # maybe epoch as well
+
+    # Load optimizer and scheduler
+    if optimizer and 'optimizer' in checkpoint:
+        optimizer.load_state_dict(checkpoint['optimizer'])
+
+    if scheduler and 'scheduler' in checkpoint:
+        scheduler.load_state_dict(checkpoint['scheduler'])
+
+    start_epoch = 0
+    total_epoch = 0
+    current_it_epoch = 0
+    current_it_total = 0
+
+    if 'epoch' in checkpoint:
+        start_epoch = checkpoint['epoch'] + 1
+        total_epoch = checkpoint['total_epoch']
+        current_it_epoch = checkpoint['current_it_epoch']
+        current_it_total = checkpoint['current_it_total']
+
+    return start_epoch, total_epoch, current_it_epoch, current_it_total
