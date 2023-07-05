@@ -19,8 +19,8 @@ from RUSH_CV.Evaluation.SSIM import SSIM
 pp = argparse.ArgumentParser(description="Testing")
 
 pp.add_argument("--debug", type=str2bool, default=False)
-pp.add_argument("--key_metric", type=str, default="SRGAN")
-pp.add_argument("--ckp_dir", type=str, default="./ckp/SRGAN/")
+pp.add_argument("--key_metric", type=str, default="PSNR")
+pp.add_argument("--ckp_dir", type=str, default="../ckp/SRGAN/")
 pp.add_argument("-s", "--scale", type=int, default=4)
 pp.add_argument("--batch_size_train", type=int, default=64)
 pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
@@ -156,7 +156,6 @@ def main():
                 
                 optimizerG.step()
 
-
                 
                 loss_d_tracking.update(d_loss.detach().cpu().item())
                 score_d_tracking.update(real_out.detach().cpu().item())
@@ -190,6 +189,9 @@ def main():
 
                     for _ , val in evaluation.items():
                         val.update(hr, sr)
+                    
+                    t.update()
+
 
 
                 performance = {}

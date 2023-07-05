@@ -15,7 +15,7 @@ from RUSH_CV.utils import load_checkpoint
 
 pp = argparse.ArgumentParser(description="Inference")
 
-pp.add_argument("--ckp_dir", type=str, default="./ckp/")
+pp.add_argument("--ckp_dir", type=str, default="../ckp/SRGAN/")
 pp.add_argument("--image_input_path", type=str, default="Examples/sample_inference_01.jpg")
 pp.add_argument("--image_output_path", type=str, default="Examples/sample_inference_01_test.png")
 pp.add_argument("-s", "--scale", type=int, default=4)
