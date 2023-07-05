@@ -5,7 +5,7 @@ import argparse
 import logging
 import torch
 
-from utils import str2bool
+from ..utils import str2bool
 from tqdm.auto import tqdm
 
 from RUSH_CV.utils import seed_everything

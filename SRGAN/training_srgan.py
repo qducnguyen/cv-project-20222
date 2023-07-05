@@ -3,7 +3,7 @@ import argparse
 import logging
 import torch
 
-from utils import str2bool
+from ..utils import str2bool
 from tqdm.auto import tqdm
 
 from RUSH_CV.utils import seed_everything
@@ -39,7 +39,7 @@ def main():
     # Seed everything
     seed_everything(73)
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device(f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu')
 
 
     # DEBUG: set logging
@@ -56,14 +56,14 @@ def main():
     valid_dataset = PexelsFlowers(data_np_path=f'data/preprocess/pexels_flowers_valid_x{args.scale}.npy',
                                     patch_size=None,
                                     is_train=False,
-                                    is_pre_scale=True,
+                                    is_pre_scale=False,
                                     scale=args.scale,
                                     is_debug=args.debug)
     
     test_dataset = PexelsFlowers(data_np_path=f'data/preprocess/pexels_flowers_test_x{args.scale}.npy',
                                    patch_size=None,
                                    is_train=False,
-                                   is_pre_scale=True,
+                                   is_pre_scale=False,
                                    scale=args.scale)
 
     train_dataloader = DataLoader(train_dataset,
@@ -170,12 +170,12 @@ def main():
                 t.update()
 
             # Eval
-            networkG.eval()
 
             for _ , val in evaluation.items():
                 val.reset()
 
-            
+            networkG.eval()
+
             with torch.no_grad():
                 for idx, data, target in tqdm(valid_dataloader):
 
