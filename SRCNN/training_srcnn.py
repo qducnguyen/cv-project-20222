@@ -1,4 +1,3 @@
-import yaml
 import os
 import argparse
 import logging
@@ -104,7 +103,6 @@ def main():
                          network=network,
                          criterion=criterion,
                          optimizer=optimizer,
-                         scheduler=None,
                          device=device,
                          evaluation=evaluation,
                          num_epoch=num_epoch,
