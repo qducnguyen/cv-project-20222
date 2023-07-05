@@ -24,7 +24,7 @@ pp.add_argument("--ckp_dir", type=str, default="./ckp/SRGAN/")
 pp.add_argument("-s", "--scale", type=int, default=4)
 pp.add_argument("--batch_size_train", type=int, default=64)
 pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
-pp.add_argument("--patch_size",type=int,default=88)
+pp.add_argument("--patch_size",type=int,default=96)
 
 pp.add_argument("--lr", type=float, default=2e-5)
 pp.add_argument("--num_epoch", type=int, default=30)
