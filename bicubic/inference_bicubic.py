@@ -1,8 +1,9 @@
-import numpy as np
+import sys
+sys.path.append(".")
+
 import cv2
 import argparse
 import logging
-from tqdm.auto import tqdm
 
 
 pp = argparse.ArgumentParser(description="Bicubic inference mode")

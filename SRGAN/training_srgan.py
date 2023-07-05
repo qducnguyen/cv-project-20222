@@ -1,9 +1,12 @@
+import sys
+sys.path.append(".")
+
 import os
 import argparse
 import logging
 import torch
 
-from ..utils import str2bool
+from utils import str2bool
 from tqdm.auto import tqdm
 
 from RUSH_CV.utils import seed_everything
@@ -103,7 +106,6 @@ def main():
     key_metric = "PSNR"
 
     # Training
-
     is_best_model = False
     best_value_key_metric = 0
 
@@ -116,7 +118,6 @@ def main():
 
         networkG.train()
         networkD.train()
-
 
         with tqdm(total=len(train_dataloader), desc= f"Epoch {epoch}/{args.num_epoch}: ") as t:
 
@@ -169,7 +170,6 @@ def main():
                 t.update()
 
             # Eval
-
             for _ , val in evaluation.items():
                 val.reset()
 
@@ -190,9 +190,6 @@ def main():
                     for _ , val in evaluation.items():
                         val.update(hr, sr)
                     
-                    t.update()
-
-
 
                 performance = {}
                 for key , val in evaluation.items():
@@ -221,13 +218,12 @@ def main():
                         checkpoint_path=args.ckp_dir)
 
 
-
+    logging.info(f"Best valid performance on {key_metric} : {best_value_key_metric}")
 
     logging.info("-" * 20)
     logging.info("Evaluation on test set ...")
 
     test_evaluation = {"PSNR": PSNR(), "SSIM": SSIM()} # Dictionary  must be
-
 
     load_checkpoint(os.path.join(args.ckp_dir, "best.pth"), networkG)
     networkG.eval()

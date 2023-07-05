@@ -1,3 +1,6 @@
+import sys
+sys.path.append(".")
+
 from torchvision.transforms import transforms
 from PIL import Image
 

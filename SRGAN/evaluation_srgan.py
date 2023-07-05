@@ -1,20 +1,19 @@
 ### For replicate results on evaluation set, test set (just for CNN for now) on one particular checkpoint
+import sys
+sys.path.append(".")
 
 import os
 import argparse
 import logging
 import torch
 
-from ..utils import str2bool
 from tqdm.auto import tqdm
 
 from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
-from RUSH_CV.Network.SRGAN import Generator, Discriminator
-from RUSH_CV.Loss.GANLoss import GeneratorLoss
-from RUSH_CV.utils import RunningAverage, save_checkpoint, load_checkpoint
-from RUSH_CV.Optimizer.Adam import Adam
+from RUSH_CV.Network.SRGAN import Generator
+from RUSH_CV.utils import load_checkpoint
 from RUSH_CV.Evaluation.PSNR import PSNR
 from RUSH_CV.Evaluation.SSIM import SSIM
 
