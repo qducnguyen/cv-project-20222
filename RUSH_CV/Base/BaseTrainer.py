@@ -12,7 +12,6 @@ class BaseTrainer():
                  test_dataloader,
                  network,
                  optimizer,
-                 scheduler=None,
                  device=None,
                  evaluation=None,
                  num_epoch=10,
@@ -27,7 +26,6 @@ class BaseTrainer():
 
         self.network = network
         self.optimizer = optimizer
-        self.scheduler = scheduler
         
         self.device = device
 
@@ -149,8 +147,6 @@ class BaseTrainer():
         self.network.zero_grad()
         loss.backward()
         self.optimizer.step()
-        if self.scheduler is not None:
-            self.scheduler.step()
 
     @torch.no_grad()
     def evaluate(self, valid=False):

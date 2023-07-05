@@ -1,9 +1,11 @@
-import yaml
+import sys
+sys.path.append(".")
+
 import os
 import argparse
 import logging
 
-from utils import str2bool
+from ..utils import str2bool
 
 from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
@@ -104,7 +106,6 @@ def main():
                          network=network,
                          criterion=criterion,
                          optimizer=optimizer,
-                         scheduler=None,
                          device=device,
                          evaluation=evaluation,
                          num_epoch=num_epoch,

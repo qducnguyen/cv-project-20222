@@ -1,4 +1,6 @@
 ## Give one images -> return new images based on models (current is CNN), -> return HR imagew
+import sys
+sys.path.append(".")
 
 import yaml
 import os

@@ -1,3 +1,6 @@
+import sys
+sys.path.append(".")
+
 ### For replicate results on evaluation set, test set (just for CNN for now) on one particular checkpoint
 
 import os
@@ -67,7 +70,6 @@ def main():
                          network=network,
                          criterion=criterion,
                          optimizer=None,
-                         scheduler=None,
                          device=device,
                          evaluation=evaluation,
                          num_epoch=None,
