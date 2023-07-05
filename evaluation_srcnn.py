@@ -11,6 +11,8 @@ from RUSH_CV.DataLoader.DataLoader import DataLoader
 from RUSH_CV.Network.SRCNN import SRCNN
 from RUSH_CV.Loss.MSELoss import MSELoss
 from RUSH_CV.Evaluation.PSNR import PSNR
+from RUSH_CV.Evaluation.SSIM import SSIM
+
 from RUSH_CV.Trainer.CNNTrainer import CNNTrainer
 
 
@@ -57,7 +59,7 @@ def main():
 
     # Evaluation
     device = 0
-    evaluation = {"PSNR": PSNR()} # Dictionary  must be
+    evaluation = {"PSNR": PSNR(), "SSIM":SSIM()} # Dictionary  must be
 
     trainer = CNNTrainer(train_dataloader=None,
                          valid_dataloader=valid_dataloader,
