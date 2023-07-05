@@ -5,6 +5,7 @@ import logging
 from tqdm.auto import tqdm
 
 from RUSH_CV.Evaluation.PSNR import PSNR
+from RUSH_CV.Evaluation.SSIM import SSIM
 from RUSH_CV.utils import seed_everything
 
 pp = argparse.ArgumentParser(description="Bicubic evaluation mode")
@@ -21,7 +22,7 @@ def main():
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
     for stage in ["valid", "test"]:
-        evaluation = {"PSNR": PSNR()} # Dictionary  must be
+        evaluation = {"PSNR": PSNR(), "SSIM": SSIM()} # Dictionary  must be
         data_npy = np.load(f"data/preprocess/pexels_flowers_{stage}_x{args.scale}.npy")
         for idx in tqdm(range(len(data_npy)), desc=f"Bicubic {stage}: "):
             Y_path, X_path = data_npy[idx]

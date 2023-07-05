@@ -243,10 +243,10 @@ class BaseTrainer():
         raise NotImplementedError
     
     def get_evaluation(self, idx, X, Y, Y_pred):
-        idx = idx.detach().cpu().numpy()
-        X = X.detach().cpu().numpy()
-        Y = Y.detach().cpu().numpy()
-        Y_pred = Y_pred.detach().cpu().numpy()
+        idx = idx.detach()
+        X = X.detach()
+        Y = Y.detach()
+        Y_pred = Y_pred.detach()
 
         if self.evaluation is not None:
             for _ , val in self.evaluation.items():

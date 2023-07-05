@@ -30,7 +30,7 @@ def to_device(X, device):
     if isinstance(X, torch.distributions.distribution.Distribution):
         return X
 
-    return X.to(device)
+    return X.to(device, non_blocking=True)
 
 
 
