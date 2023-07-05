@@ -11,7 +11,6 @@ from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
 from RUSH_CV.Network.SRGAN import Generator, Discriminator
 from RUSH_CV.Loss.GANLoss import GeneratorLoss
-from RUSH_CV.Loss.MSELoss import MSELoss
 from RUSH_CV.utils import RunningAverage, save_checkpoint, load_checkpoint
 from RUSH_CV.Optimizer.Adam import Adam
 from RUSH_CV.Evaluation.PSNR import PSNR
@@ -25,7 +24,7 @@ pp.add_argument("--ckp_dir", type=str, default="./ckp/SRGAN/")
 pp.add_argument("-s", "--scale", type=int, default=4)
 pp.add_argument("--batch_size_train", type=int, default=64)
 pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
-pp.add_argument("--patch_size",type=int,default=96)
+pp.add_argument("--patch_size",type=int,default=88)
 
 pp.add_argument("--lr", type=float, default=2e-5)
 pp.add_argument("--num_epoch", type=int, default=30)
@@ -222,7 +221,6 @@ def main():
 
 
 
-
     logging.info("-" * 20)
     logging.info("Evaluation on test set ...")
 
@@ -231,9 +229,6 @@ def main():
 
     load_checkpoint(os.path.join(args.ckp_dir, "best.pth"), networkG)
     networkG.eval()
-
-    for _ , val in evaluation.items():
-                val.reset()
 
     with torch.no_grad():
         for idx, data, target in tqdm(test_dataloader):
@@ -247,7 +242,7 @@ def main():
             hr = hr.detach()
             sr = sr.detach()
 
-            for _ , val in evaluation.items():
+            for _ , val in test_evaluation.items():
                 val.update(hr, sr)
 
 
