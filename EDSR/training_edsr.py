@@ -10,7 +10,7 @@ from utils import str2bool
 from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
-from RUSH_CV.Network.EDSR import EDSR
+from RUSH_CV.Network.EDSR import EDSRAttention, EDSR
 from RUSH_CV.Loss.L1Loss import L1Loss
 from RUSH_CV.Optimizer.Adam import Adam
 from RUSH_CV.Evaluation.PSNR import PSNR
@@ -25,6 +25,7 @@ pp.add_argument("-s", "--scale", type=int, default=4)
 pp.add_argument("--batch_size_train", type=int, default=4)
 pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
 pp.add_argument("--patch_size",type=int,default=512)
+pp.add_argument("--attention", "-a", type=str2bool, default=False)
 
 pp.add_argument("--lr", type=float, default=1e-4)
 pp.add_argument("--num_epoch", type=int, default=15)
@@ -81,7 +82,11 @@ def main():
                                   drop_last=False)
 
     # Network
-    network = EDSR(num_channels=3, base_channel=64, num_residuals=4 , upscale_factor=args.scale)
+    if args.attention:
+        network = EDSRAttention(num_channels=3, base_channel=64, num_residuals=4 , upscale_factor=args.scale)
+    else:
+        network = EDSR(num_channels=3, base_channel=64, num_residuals=4 , upscale_factor=args.scale)
+        
     network.weight_init()
     # Loss
     criterion = L1Loss()
@@ -94,7 +99,7 @@ def main():
 
     device = args.device
     eval_epoch = 1
-    num_epoch = args.num_epoch
+    num_epoch = args.num_epoch  
 
 
     trainer = CNNTrainer(train_dataloader=train_dataloader,

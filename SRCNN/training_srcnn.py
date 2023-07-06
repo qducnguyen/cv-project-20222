@@ -25,7 +25,7 @@ def main(args):
     # DEBUG: set logging
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
-    ckp_dir = os.path.join(args.ckp_dir,  "SRCNN", args.scale + "-a")
+    ckp_dir = os.path.join(args.ckp_dir,  "SRCNN", str(args.scale) + "-a" if args.attention else str(args.scale))
 
 
 

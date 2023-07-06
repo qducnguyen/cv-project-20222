@@ -27,7 +27,7 @@ class VDSR(nn.Module):
 
 class VDSRAttention(nn.Module):
     def __init__(self, num_channels, base_channels, num_residuals):
-        super(VDSRAttention, self).__init__()
+        super(VDSR, self).__init__()
 
         self.input_conv = nn.Sequential(nn.Conv2d(num_channels, base_channels, kernel_size=3, stride=1, padding=1, bias=False), 
                                         nn.ReLU(inplace=True),
