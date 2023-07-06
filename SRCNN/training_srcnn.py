@@ -16,26 +16,8 @@ from RUSH_CV.Optimizer.Adam import Adam
 from RUSH_CV.Evaluation.PSNR import PSNR
 from RUSH_CV.Trainer.CNNTrainer import CNNTrainer
 
-pp = argparse.ArgumentParser(description="Training SRCNN")
 
-pp.add_argument("--debug", type=str2bool, default=False)
-pp.add_argument("--key_metric", type=str, default="PSNR")
-pp.add_argument("--ckp_dir", type=str, default="./ckp/SRCNN/")
-pp.add_argument("-s", "--scale", type=int, default=4)
-pp.add_argument("--batch_size_train", type=int, default=4)
-pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
-pp.add_argument("--patch_size",type=int,default=64)
-pp.add_argument("-a", "--attention", type=str2bool, default=False)
-
-pp.add_argument("--lr", type=float, default=1e-4)
-pp.add_argument("--num_epoch", type=int, default=30)
-pp.add_argument("-d", "--device", type=int, default=0)
-
-
-args = pp.parse_args()
-
-
-def main():
+def main(args):
 
     # Seed everything
     seed_everything(73)
@@ -84,7 +66,6 @@ def main():
     # Network
     if args.attention:
         network = SRCNNAttention()
-        network.weight_init()
     else:
         network = SRCNN()
     # Loss
@@ -131,7 +112,27 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+
+    pp = argparse.ArgumentParser(description="Training SRCNN")
+
+    pp.add_argument("--debug", type=str2bool, default=False)
+    pp.add_argument("--key_metric", type=str, default="PSNR")
+    pp.add_argument("--ckp_dir", type=str, default="./ckp/SRCNN/")
+    pp.add_argument("-s", "--scale", type=int, default=4)
+    pp.add_argument("--batch_size_train", type=int, default=4)
+    pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
+    pp.add_argument("--patch_size",type=int,default=64)
+    pp.add_argument("-a", "--attention", type=str2bool, default=False)
+
+    pp.add_argument("--lr", type=float, default=1e-4)
+    pp.add_argument("--num_epoch", type=int, default=30)
+    pp.add_argument("-d", "--device", type=int, default=0)
+
+
+    args = pp.parse_args()
+
+
+    main(args)
 
 
 

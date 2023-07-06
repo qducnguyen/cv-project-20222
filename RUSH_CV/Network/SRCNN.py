@@ -44,15 +44,3 @@ class SRCNNAttention(nn.Module):
         x = self.conv3(x)
 
         return x
-    
-    def weight_init(self):
-        for m in self._modules:
-            weights_init_kaiming(m)
-
-
-
-def weights_init_kaiming(m):
-    class_name = m.__class__.__name__
-    if class_name.find('Conv2d') != -1:
-        if m.bias is None:
-            nn.init.kaiming_normal_(m.weight)
