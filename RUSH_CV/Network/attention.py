@@ -1,5 +1,3 @@
-import math
-
 import torch
 import torch.nn as nn
 
@@ -15,10 +13,11 @@ class ChannelAttention(nn.Module):
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
+        input_x = x
         avg_out = self.fc(self.avg_pool(x))
         max_out = self.fc(self.max_pool(x))
         out = avg_out + max_out
-        return self.sigmoid(out)
+        return self.sigmoid(out) * input_x
 
 class SpatialAttention(nn.Module):
     def __init__(self, kernel_size=7):
@@ -27,8 +26,9 @@ class SpatialAttention(nn.Module):
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
+        input_x = x
         avg_out = torch.mean(x, dim=1, keepdim=True)
         max_out, _ = torch.max(x, dim=1, keepdim=True)
         x = torch.cat([avg_out, max_out], dim=1)
         x = self.conv1(x)
-        return self.sigmoid(x)
+        return self.sigmoid(x) * input_x

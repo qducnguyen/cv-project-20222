@@ -14,7 +14,7 @@ class UNet2(nn.Module):
         self.down2 = down(128, 256)
         self.down3 = down(256, 512)
         self.down4 = down(512, 512)
-        self.up1 = up(1024, 256,bilinear=False)#,bilinear=False
+        self.up1 = up(1024, 256,bilinear=False)
         self.up2 = up(512, 128,bilinear=False)
         self.up3 = up(256, 64,bilinear=False)
         self.up4 = up(128, 32,bilinear=False)

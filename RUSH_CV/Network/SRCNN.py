@@ -1,5 +1,5 @@
 from torch import nn
-from attention import ChannelAttention, SpatialAttention
+from .attention import ChannelAttention, SpatialAttention
 
 
 class SRCNN(nn.Module):
@@ -31,20 +31,15 @@ class SRCNNAttention(nn.Module):
 
         self.conv3 = nn.Conv2d(32, num_channels, kernel_size=5, padding=5 // 2)
 
-        self.channel_attention3 = ChannelAttention(3, 8)
-        self.spatial_attention3 = SpatialAttention(7)
-
         self.relu = nn.ReLU(inplace=True)
 
     def forward(self, x):
         x = self.relu(self.conv1(x))
         x = self.channel_attention1(x)
-        x= self.spatial_attention1(x)
+        x = self.spatial_attention1(x)
         x = self.relu(self.conv2(x))
-        x = self.channel_attention2(x)
-        x = self.spatial_attention2(x)
+        x = self.channel_attention2(x) 
+        x = self.spatial_attention2(x) 
         x = self.conv3(x)
-        x = self.channel_attention3(x)
-        x = self.spatial_attention3(x)
 
         return x
