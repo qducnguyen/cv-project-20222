@@ -17,6 +17,7 @@ class SRCNN(nn.Module):
         return x
 
 class SRCNNAttention(nn.Module):
+
     def __init__(self, num_channels=3):
         super(SRCNNAttention, self).__init__()
         self.conv1 = nn.Conv2d(num_channels, 64, kernel_size=9, padding=9 // 2)
@@ -43,3 +44,15 @@ class SRCNNAttention(nn.Module):
         x = self.conv3(x)
 
         return x
+    
+    def weight_init(self):
+        for m in self._modules:
+            weights_init_kaiming(m)
+
+
+
+def weights_init_kaiming(m):
+    class_name = m.__class__.__name__
+    if class_name.find('Conv2d') != -1:
+        if m.bias is None:
+            nn.init.kaiming_normal_(m.weight)

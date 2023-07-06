@@ -84,6 +84,7 @@ def main():
     # Network
     if args.attention:
         network = SRCNNAttention()
+        network.weight_init()
     else:
         network = SRCNN()
     # Loss
