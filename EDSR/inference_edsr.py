@@ -19,8 +19,8 @@ from RUSH_CV.utils import load_checkpoint
 pp = argparse.ArgumentParser(description="Inference")
 
 pp.add_argument("--ckp_dir", type=str, default="./ckp/EDSR/")
-pp.add_argument("--image_input_path", type=str, default="Examples/sample_inference_01.jpg")
-pp.add_argument("--image_output_path", type=str, default="Examples/sample_inference_01_test.png")
+pp.add_argument("--image_input_path", type=str, default="examples/sample_inference_01.jpg")
+pp.add_argument("--image_output_path", type=str, default="examples/sample_inference_01_test.png")
 pp.add_argument("-s", "--scale", type=int, default=4)
 
 args = pp.parse_args()
@@ -52,7 +52,7 @@ def main():
         out = network(image)
         out_img = transforms.ToPILImage()(out[0].data.cpu())
         out_img.save(args.image_output_path)
-        logging.info(f"Output image shape of {out_img.shape} stored at {args.image_output_path}")
+        logging.info(f"Output image shape of {out_img.size} stored at {args.image_output_path}")
 
 
 if __name__ == "__main__":

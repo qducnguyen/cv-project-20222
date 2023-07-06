@@ -29,8 +29,8 @@ if __name__ == '__main__':
 
     pp = argparse.ArgumentParser(description="Bicubic inference mode")
 
-    pp.add_argument("--image_input_path", type=str, default="Examples/sample_inference_01.jpg")
-    pp.add_argument("--image_output_path", type=str, default="Examples/sample_inference_01_test.png")
+    pp.add_argument("--image_input_path", type=str, default="examples/sample_inference_01.jpg")
+    pp.add_argument("--image_output_path", type=str, default="examples/sample_inference_01_test.png")
     pp.add_argument("--scale", type=int, default=4)
 
 
