@@ -65,7 +65,7 @@ class BaseTrainer():
         if self.device is None:
             self.device = 'cpu'
         if self.device != 'cpu':
-            torch.cuda.set_device(self.device)
+            self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         
         logging.info("Training on " + str(self.device))
 

@@ -16,7 +16,7 @@ from RUSH_CV.utils import load_checkpoint
 
 pp = argparse.ArgumentParser(description="Inference")
 
-pp.add_argument("--ckp_dir", type=str, default="./ckp/SRCNN/")
+pp.add_argument("--ckp_dir", type=str, default="./ckp/")
 pp.add_argument("--image_input_path", type=str, default="examples/sample_inference_01.jpg")
 pp.add_argument("--image_output_path", type=str, default="examples/sample_inference_01_test.png")
 pp.add_argument("-s", "--scale", type=int, default=4)
@@ -27,6 +27,7 @@ args = pp.parse_args()
 def main():
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
+    ckp_dir = os.path.join(args.ckp_dir,  "SRCNN", args.scale + "-a")
 
     logging.debug("Detecting device ...")
     if torch.cuda.is_available():
@@ -43,7 +44,7 @@ def main():
 
     logging.debug("Loading model ...")
     network = SRCNN()
-    load_checkpoint(os.path.join(args.ckp_dir, "best.pth"), network)
+    load_checkpoint(os.path.join(ckp_dir, "best.pth"), network)
 
     logging.debug("Predicting ...")
     with torch.no_grad():
