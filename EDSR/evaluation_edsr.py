@@ -34,13 +34,13 @@ def main():
     valid_dataset = PexelsFlowers(f'data/preprocess/pexels_flowers_valid_x{args.scale}.npy',
                                    patch_size=None,
                                     is_train=False,
-                                    is_pre_scale=True,
+                                    is_pre_scale=False,
                                     scale=args.scale)
     
     test_dataset = PexelsFlowers(f'data/preprocess/pexels_flowers_test_x{args.scale}.npy',
                                    patch_size=None,
                                    is_train=False,
-                                   is_pre_scale=True,
+                                   is_pre_scale=False,
                                    scale=args.scale)
 
     valid_dataloader = DataLoader(valid_dataset,
@@ -54,7 +54,7 @@ def main():
                                   drop_last=False)
 
     # Network
-    network = EDSR(num_channels=3, base_channels=64, num_residuals=6, upscale_factor=args.scale)
+    network = EDSR(num_channels=3, base_channel=64, num_residuals=4 , upscale_factor=args.scale)
     criterion = L1Loss()
 
     # Loss

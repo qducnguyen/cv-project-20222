@@ -58,5 +58,8 @@ def main():
         out_img = transforms.ToPILImage()(out[0].data.cpu())
         out_img.save(args.image_output_path)
 
+        logging.info(f"Output image shape of {out_img.shape} stored at {args.image_output_path}")
+
+
 if __name__ == '__main__':
     main()
