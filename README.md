@@ -9,18 +9,17 @@ https://colab.research.google.com/drive/1FUUh2Sav1IhfKmKPvRKROXAq_9bBBp6A?usp=sh
 
 ## Installation 
 
-## Dataset Preparation: Please 
+## Dataset Preparation 
 
 ## Team Members
+
 
 ## Todo
 
 - [x] Dataset Class
 - [ ] Read me download dataset, setting the dataset
-- [ ] Using yaml config file
 - [x] Model Class
 - [x] Debug mode
-- [ ] Save run, resume run
-- [ ] Logging
-- [ ] Training
+- [x] Training
+
 

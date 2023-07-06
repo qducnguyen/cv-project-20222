@@ -6,16 +6,9 @@ import argparse
 import logging
 
 
-pp = argparse.ArgumentParser(description="Bicubic inference mode")
-
-pp.add_argument("--image_input_path", type=str, default="Examples/sample_inference_01.jpg")
-pp.add_argument("--image_output_path", type=str, default="Examples/sample_inference_01_test.png")
-pp.add_argument("--scale", type=int, default=4)
 
 
-args = pp.parse_args()
-
-def main():
+def main(args):
     
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
@@ -33,4 +26,14 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+
+    pp = argparse.ArgumentParser(description="Bicubic inference mode")
+
+    pp.add_argument("--image_input_path", type=str, default="Examples/sample_inference_01.jpg")
+    pp.add_argument("--image_output_path", type=str, default="Examples/sample_inference_01_test.png")
+    pp.add_argument("--scale", type=int, default=4)
+
+
+    args = pp.parse_args()
+
+    main(args)

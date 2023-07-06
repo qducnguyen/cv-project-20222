@@ -10,7 +10,7 @@ import torch
 from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
-from RUSH_CV.Network.SRCNN import SRCNN
+from RUSH_CV.Network.VDSR import VDSR
 from RUSH_CV.Loss.MSELoss import MSELoss
 from RUSH_CV.Evaluation.PSNR import PSNR
 from RUSH_CV.Evaluation.SSIM import SSIM
@@ -20,7 +20,7 @@ from RUSH_CV.Trainer.CNNTrainer import CNNTrainer
 
 pp = argparse.ArgumentParser(description="Evaluation mode")
 
-pp.add_argument("--ckp_dir", type=str, default="./ckp/SRCNN/")
+pp.add_argument("--ckp_dir", type=str, default="./ckp/VDSR/")
 pp.add_argument("--scale", type=int, default=4)
 
 args = pp.parse_args()
@@ -54,7 +54,7 @@ def main():
                                   drop_last=False)
 
     # Network
-    network = SRCNN()
+    network = VDSR(num_channels=3, base_channels=64, num_residuals=6)
 
     # Loss
     criterion = MSELoss()
@@ -85,9 +85,7 @@ def main():
         torch.cuda.set_device(trainer.device)
         
     logging.info("Evaluation on " + str(trainer.device))
-
     trainer.network = trainer.network.to(trainer.device)
-
 
     valid_results = trainer.predict(valid=True)
     logging.info(f"Valid results: {valid_results}")
