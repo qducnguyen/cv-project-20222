@@ -12,24 +12,25 @@ from tqdm.auto import tqdm
 from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
-from RUSH_CV.Network.SRGAN import Generator, Discriminator
-from RUSH_CV.Loss.GANLoss import GeneratorLoss
+from RUSH_CV.Network.UNet import UNet2, UNet4, UNet8
 from RUSH_CV.utils import RunningAverage, save_checkpoint, load_checkpoint
 from RUSH_CV.Optimizer.Adam import Adam
+from RUSH_CV.Loss.MSELoss import MSELoss
+from RUSH_CV.Loss.L1Loss import L1Loss
 from RUSH_CV.Evaluation.PSNR import PSNR
 from RUSH_CV.Evaluation.SSIM import SSIM
 
-pp = argparse.ArgumentParser(description="Testing")
+pp = argparse.ArgumentParser(description="UNet")
 
 pp.add_argument("--debug", type=str2bool, default=False)
 pp.add_argument("--key_metric", type=str, default="PSNR")
-pp.add_argument("--ckp_dir", type=str, default="../ckp/SRGAN/")
+pp.add_argument("--ckp_dir", type=str, default="../ckp/UNet/")
 pp.add_argument("-s", "--scale", type=int, default=4)
-pp.add_argument("--batch_size_train", type=int, default=64)
+pp.add_argument("--batch_size_train", type=int, default=16)
 pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
-pp.add_argument("--patch_size",type=int,default=96)
+pp.add_argument("--patch_size",type=int,default=256)
 
-pp.add_argument("--lr", type=float, default=2e-5)
+pp.add_argument("--lr", type=float, default=2e-4)
 pp.add_argument("--num_epoch", type=int, default=30)
 pp.add_argument("-d", "--device", type=int, default=0)
 
@@ -60,8 +61,7 @@ def main():
                                     patch_size=None,
                                     is_train=False,
                                     is_pre_scale=False,
-                                    scale=args.scale,
-                                    is_debug=args.debug)
+                                    scale=args.scale)
     
     test_dataset = PexelsFlowers(data_np_path=f'data/preprocess/pexels_flowers_test_x{args.scale}.npy',
                                    patch_size=None,
@@ -87,19 +87,27 @@ def main():
                                   drop_last=False)
 
     # Network
-    networkG = Generator(scale_factor=args.scale)
-    networkD = Discriminator()
+    if args.scale == 2:
+        network = UNet2(3, 3)
+    elif args.scale == 3:
+        network = UNet8(3, 3) #
+    else:
+        network = UNet4(3, 3)
 
+    network.weight_init(mean=0.0, std=0.01)
+    
     # Loss
-    generator_criterion = GeneratorLoss()
 
-    generator_criterion = generator_criterion.to(device)
-    networkG = networkG.to(device)
-    networkD = networkD.to(device)
+    criterion = MSELoss()
+    criterion_2 = L1Loss()
+
+
+    criterion = criterion.to(device)
+    criterion_2 = criterion_2.to(device)
+    network = network.to(device)
 
     # Optimizer 
-    optimizerG = Adam(networkG.parameters(), lr=args.lr)
-    optimizerD = Adam(networkD.parameters(), lr=args.lr)
+    optimizer = Adam(network.parameters(), lr=args.lr, weight_decay=1e-6)
      
     # Evaluation metrics
     evaluation = {"PSNR": PSNR()} # Dictionary  must be
@@ -109,15 +117,10 @@ def main():
     is_best_model = False
     best_value_key_metric = 0
 
-    loss_d_tracking = RunningAverage()
-    loss_g_tracking = RunningAverage()
-    score_d_tracking = RunningAverage()
-    score_g_tracking = RunningAverage()
+    loss_tracking = RunningAverage()
 
     for epoch in range(1, args.num_epoch+1):
-
-        networkG.train()
-        networkD.train()
+        network.train()
 
         with tqdm(total=len(train_dataloader), desc= f"Epoch {epoch}/{args.num_epoch}: ") as t:
 
@@ -126,61 +129,35 @@ def main():
                 # (1) Update D network: maximize D(x)-1-D(G(z))
                 ###########################
                 idx = idx.to(device)
-                real_img = target.to(device)
-                z = data.to(device)
+                target = target.to(device)
+                data = data.to(device)
 
-                fake_img = networkG(z)
-        
-                networkG.zero_grad()
-                real_out = networkD(real_img).mean()
-                fake_out = networkD(fake_img).mean()
+                optimizer.zero_grad()
+                prediction = network(data)
 
-                d_loss = 1 - real_out + fake_out
-                d_loss.backward(retain_graph=True)
-                optimizerD.step()
+                loss1 = criterion(prediction, target)
+                loss2 = criterion_2(prediction, target)
+                loss = loss1 + 0.1*loss2
+                loss.backward()
+                optimizer.step()
 
+                loss_tracking.update(loss.detach().cpu().item())
 
-
-                ############################
-                # (2) Update G network: minimize 1-D(G(z)) + Perception Loss + Image Loss + TV Loss
-                ###########################
-                networkG.zero_grad()
-                ## The two lines below are added to prevent runetime error in Google Colab ##
-                fake_img = networkG(z)
-                fake_out = networkD(fake_img).mean()
-                ##
-                g_loss = generator_criterion(fake_out, fake_img, real_img)
-                g_loss.backward()
-                
-                fake_img = networkG(z)
-                fake_out = networkD(fake_img).mean()
-                
-                optimizerG.step()
-
-                
-                loss_d_tracking.update(d_loss.detach().cpu().item())
-                score_d_tracking.update(real_out.detach().cpu().item())
-                loss_g_tracking.update(g_loss.detach().cpu().item())
-                score_g_tracking.update(fake_out.detach().cpu().item())
-
-                t.set_postfix(loss_d=loss_d_tracking(), 
-                              loss_g=loss_g_tracking(), 
-                              score_d=score_d_tracking(), 
-                              score_g=score_g_tracking())
+                t.set_postfix(loss=loss_tracking())
                 t.update()
 
         # Eval
         for _ , val in evaluation.items():
             val.reset()
 
-        networkG.eval()
+        network.eval()
 
         with torch.no_grad():
             for idx, data, target in tqdm(valid_dataloader):
 
                 lr = data.to(device)
                 hr = target.to(device)
-                sr = networkG(lr)
+                sr = network(lr)
 
                 idx = idx.detach()
                 lr = lr.detach()
@@ -212,8 +189,8 @@ def main():
                     current_it_epoch=None,
                     current_it_total=None,
                     total_epoch=args.num_epoch,
-                    model=networkG,
-                    optimizer= optimizerG,
+                    model=network,
+                    optimizer= optimizer,
                     is_best=is_best_model,
                     checkpoint_path=args.ckp_dir)
 
@@ -225,15 +202,15 @@ def main():
 
     test_evaluation = {"PSNR": PSNR(), "SSIM": SSIM()} # Dictionary  must be
 
-    load_checkpoint(os.path.join(args.ckp_dir, "best.pth"), networkG)
-    networkG.eval()
+    load_checkpoint(os.path.join(args.ckp_dir, "best.pth"), network)
+    network.eval()
 
     with torch.no_grad():
         for idx, data, target in tqdm(test_dataloader):
 
             lr = data.to(device)
             hr = target.to(device)
-            sr = networkG(lr)
+            sr = network(lr)
 
             idx = idx.detach()
             lr = lr.detach()
