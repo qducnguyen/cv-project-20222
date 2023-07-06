@@ -10,13 +10,13 @@ import cv2
 import numpy as np
 import torch
 
-from RUSH_CV.Network.SRCNN import SRCNN
+from RUSH_CV.Network.VDSR import VDSR
 from RUSH_CV.utils import load_checkpoint
 
 
 pp = argparse.ArgumentParser(description="Inference")
 
-pp.add_argument("--ckp_dir", type=str, default="./ckp/SRCNN/")
+pp.add_argument("--ckp_dir", type=str, default="./ckp/VDSR/")
 pp.add_argument("--image_input_path", type=str, default="Examples/sample_inference_01.jpg")
 pp.add_argument("--image_output_path", type=str, default="Examples/sample_inference_01_test.png")
 pp.add_argument("-s", "--scale", type=int, default=4)
@@ -42,7 +42,7 @@ def main():
     img_tensor.mul_(1.0 / 255)
 
     logging.debug("Loading model ...")
-    network = SRCNN()
+    network = VDSR(num_channels=3, base_channels=64, num_residuals=6)
     load_checkpoint(os.path.join(args.ckp_dir, "best.pth"), network)
 
     logging.debug("Predicting ...")

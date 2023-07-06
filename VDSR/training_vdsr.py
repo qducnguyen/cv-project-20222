@@ -10,17 +10,17 @@ from utils import str2bool
 from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
-from RUSH_CV.Network.SRCNN import SRCNN
+from RUSH_CV.Network.VDSR import VDSR
 from RUSH_CV.Loss.MSELoss import MSELoss
 from RUSH_CV.Optimizer.Adam import Adam
 from RUSH_CV.Evaluation.PSNR import PSNR
 from RUSH_CV.Trainer.CNNTrainer import CNNTrainer
 
-pp = argparse.ArgumentParser(description="Training SRCNN")
+pp = argparse.ArgumentParser(description="Training VDSR")
 
 pp.add_argument("--debug", type=str2bool, default=False)
 pp.add_argument("--key_metric", type=str, default="PSNR")
-pp.add_argument("--ckp_dir", type=str, default="./ckp/SRCNN/")
+pp.add_argument("--ckp_dir", type=str, default="./ckp/VDSR")
 pp.add_argument("-s", "--scale", type=int, default=4)
 pp.add_argument("--batch_size_train", type=int, default=4)
 pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
@@ -81,16 +81,12 @@ def main():
                                   drop_last=False)
 
     # Network
-    network = SRCNN()
+    network = VDSR(num_channels=3, base_channels=64, num_residuals=6)
     # Loss
     criterion = MSELoss()
 
     # Optimizer 
-    optimizer = Adam([
-        {'params': network.conv1.parameters()},
-        {'params': network.conv2.parameters()},
-        {'params': network.conv3.parameters(), 'lr': args.lr * 0.1}
-    ], lr=args.lr)
+    optimizer = Adam(network.parameters(),lr=args.lr)
 
     # Evaluation
     evaluation = {"PSNR": PSNR()} # Dictionary  must be
