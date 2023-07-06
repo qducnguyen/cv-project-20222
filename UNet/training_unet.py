@@ -17,6 +17,7 @@ from RUSH_CV.utils import RunningAverage, save_checkpoint, load_checkpoint
 from RUSH_CV.Optimizer.Adam import Adam
 from RUSH_CV.Loss.MSELoss import MSELoss
 from RUSH_CV.Loss.L1Loss import L1Loss
+from RUSH_CV.Loss.GradientLoss import GradientLoss
 from RUSH_CV.Evaluation.PSNR import PSNR
 from RUSH_CV.Evaluation.SSIM import SSIM
 
@@ -26,11 +27,11 @@ pp.add_argument("--debug", type=str2bool, default=False)
 pp.add_argument("--key_metric", type=str, default="PSNR")
 pp.add_argument("--ckp_dir", type=str, default="../ckp/UNet/")
 pp.add_argument("-s", "--scale", type=int, default=4)
-pp.add_argument("--batch_size_train", type=int, default=16)
+pp.add_argument("--batch_size_train", type=int, default=4)
 pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
-pp.add_argument("--patch_size",type=int,default=256)
+pp.add_argument("--patch_size",type=int,default=512)
 
-pp.add_argument("--lr", type=float, default=2e-4)
+pp.add_argument("--lr", type=float, default=1e-3)
 pp.add_argument("--num_epoch", type=int, default=30)
 pp.add_argument("-d", "--device", type=int, default=0)
 
@@ -98,12 +99,14 @@ def main():
     
     # Loss
 
-    criterion = MSELoss()
-    criterion_2 = L1Loss()
+    criterion_mse = MSELoss()
+    criterion_l1 = L1Loss()
+    criterion_gra = GradientLoss()
 
 
-    criterion = criterion.to(device)
-    criterion_2 = criterion_2.to(device)
+    criterion_mse = criterion_mse.to(device)
+    criterion_l1 = criterion_l1.to(device)
+    criterion_gra = criterion_gra.to(device)
     network = network.to(device)
 
     # Optimizer 
@@ -121,9 +124,11 @@ def main():
 
     for epoch in range(1, args.num_epoch+1):
         network.train()
+        is_best_model = False
 
         with tqdm(total=len(train_dataloader), desc= f"Epoch {epoch}/{args.num_epoch}: ") as t:
 
+            
             for idx, data, target in train_dataloader:
                 ############################
                 # (1) Update D network: maximize D(x)-1-D(G(z))
@@ -135,9 +140,10 @@ def main():
                 optimizer.zero_grad()
                 prediction = network(data)
 
-                loss1 = criterion(prediction, target)
-                loss2 = criterion_2(prediction, target)
-                loss = loss1 + 0.1*loss2
+                loss_mse = criterion_mse(prediction, target)
+                # loss_l1 = criterion_l1(prediction, target)
+                # loss_gra = criterion_gra(prediction, target)
+                loss = loss_mse 
                 loss.backward()
                 optimizer.step()
 

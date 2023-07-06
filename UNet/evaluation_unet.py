@@ -20,7 +20,7 @@ from RUSH_CV.Evaluation.SSIM import SSIM
 
 pp = argparse.ArgumentParser(description="Evaluation mode")
 
-pp.add_argument("--ckp_dir", type=str, default="../ckp/SRGAN/")
+pp.add_argument("--ckp_dir", type=str, default="../ckp/UNet/")
 pp.add_argument("--scale", type=int, default=4)
 
 args = pp.parse_args()

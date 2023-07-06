@@ -118,6 +118,7 @@ def main():
 
         networkG.train()
         networkD.train()
+        is_best_model = False
 
         with tqdm(total=len(train_dataloader), desc= f"Epoch {epoch}/{args.num_epoch}: ") as t:
 
