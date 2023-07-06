@@ -10,17 +10,17 @@ from utils import str2bool
 from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
-from RUSH_CV.Network.VDSR import VDSR
-from RUSH_CV.Loss.MSELoss import MSELoss
+from RUSH_CV.Network.EDSR import EDSR
+from RUSH_CV.Loss.L1Loss import L1Loss
 from RUSH_CV.Optimizer.Adam import Adam
 from RUSH_CV.Evaluation.PSNR import PSNR
 from RUSH_CV.Trainer.CNNTrainer import CNNTrainer
 
-pp = argparse.ArgumentParser(description="Training VDSR")
+pp = argparse.ArgumentParser(description="Training EDSR")
 
 pp.add_argument("--debug", type=str2bool, default=False)
 pp.add_argument("--key_metric", type=str, default="PSNR")
-pp.add_argument("--ckp_dir", type=str, default="./ckp/VDSR")
+pp.add_argument("--ckp_dir", type=str, default="./ckp/EDSR/")
 pp.add_argument("-s", "--scale", type=int, default=4)
 pp.add_argument("--batch_size_train", type=int, default=4)
 pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
@@ -46,20 +46,21 @@ def main():
     train_dataset = PexelsFlowers(data_np_path=f'data/preprocess/pexels_flowers_train_x{args.scale}.npy',
                                     patch_size=args.patch_size,
                                     is_train=True,
-                                    is_pre_scale=True,
+                                    is_pre_scale=False,
                                     scale=args.scale,
                                     is_debug=args.debug)
     
     valid_dataset = PexelsFlowers(data_np_path=f'data/preprocess/pexels_flowers_valid_x{args.scale}.npy',
                                    patch_size=None,
                                     is_train=False,
-                                    is_pre_scale=True,
-                                    scale=args.scale)
+                                    is_pre_scale=False,
+                                    scale=args.scale,
+                                    is_debug=args.debug)
     
     test_dataset = PexelsFlowers(data_np_path=f'data/preprocess/pexels_flowers_test_x{args.scale}.npy',
                                    patch_size=None,
                                    is_train=False,
-                                   is_pre_scale=True,
+                                   is_pre_scale=False,
                                    scale=args.scale)
 
     train_dataloader = DataLoader(train_dataset,
@@ -80,13 +81,13 @@ def main():
                                   drop_last=False)
 
     # Network
-    network = VDSR(num_channels=3, base_channels=64, num_residuals=6)
+    network = EDSR(num_channels=3, base_channels=64, num_residuals=4, upscale_factor=args.scale)
     network.weight_init()
     # Loss
-    criterion = MSELoss()
+    criterion = L1Loss()
 
     # Optimizer 
-    optimizer = Adam(network.parameters(),lr=args.lr)
+    optimizer = Adam(network.parameters(),lr=args.lr, betas=(0.9, 0.999), eps=1e-8)
 
     # Evaluation
     evaluation = {"PSNR": PSNR()} # Dictionary  must be
