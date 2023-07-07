@@ -210,8 +210,7 @@ class BaseTrainer():
 
                     self.end_predict_batch()
 
-                    t.set_postfix(**{u:f"{v():.3f}" for u, v in self.performance.items()})
-
+                    t.set_postfix(**{u:f"{v():.3f}" for u, v in self.evaluation.items()})
                     t.update()
 
     @torch.no_grad()

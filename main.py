@@ -29,9 +29,9 @@ args = parser.parse_args()
 
 def main():
     if args.model == "bicubic":
-        print("Bicubic model do not need to be trained.")
+        raise("Bicubic model do not need to be trained.")
     elif args.model == "srcnn":
-        trainer  = SRCNNTrainer(args)
+        trainer = SRCNNTrainer(args)
     else:
         raise Exception("The model does not exist")
     
