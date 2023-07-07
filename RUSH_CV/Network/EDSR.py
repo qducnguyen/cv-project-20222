@@ -51,7 +51,6 @@ class ResnetBlock(nn.Module):
         super(ResnetBlock, self).__init__()
         self.conv1 = nn.Conv2d(num_channel, num_channel, kernel, stride, padding)
         self.conv2 = nn.Conv2d(num_channel, num_channel, kernel, stride, padding)
-        self.bn = nn.BatchNorm2d(num_channel)
         self.activation = nn.ReLU(inplace=True)
 
     def forward(self, x):
@@ -77,8 +76,12 @@ class EDSRAttention(nn.Module):
         self.mid_conv = nn.Conv2d(base_channel, base_channel, kernel_size=3, stride=1, padding=1)
 
         upscale = []
-        for _ in range(int(math.log2(upscale_factor))):
-            upscale.append(PixelShuffleBlock(base_channel, base_channel, upscale_factor=2))
+
+        if upscale_factor == 3:
+            upscale.append(PixelShuffleBlock(base_channel, base_channel, upscale_factor=3))
+        else:
+            for _ in range(int(math.log2(upscale_factor))):
+                upscale.append(PixelShuffleBlock(base_channel, base_channel, upscale_factor=2))
 
         self.upscale_layers = nn.Sequential(*upscale)
 
@@ -105,22 +108,17 @@ class ResnetBlockAttention(nn.Module):
         super(ResnetBlockAttention, self).__init__()
         self.conv1 = nn.Conv2d(num_channel, num_channel, kernel, stride, padding)
         self.conv2 = nn.Conv2d(num_channel, num_channel, kernel, stride, padding)
-        # self.bn = nn.BatchNorm2d(num_channel)
         self.activation = nn.ReLU(inplace=True)
-        self.channel_attention1 = ChannelAttention(num_channel, 8)
-        self.channel_attention2 = ChannelAttention(num_channel, 8)
-        self.spatial_attention1 = SpatialAttention(7)
-        self.spatial_attention2 = SpatialAttention(7)
+        self.channel_attention = ChannelAttention(num_channel, 8)
+        self.spatial_attention = SpatialAttention(7)
 
     def forward(self, x):
         residual = x
         x = self.conv1(x)
         x = self.activation(x)
-        x = self.channel_attention1(x)
-        x = self.spatial_attention1(x)
         x = self.conv2(x)
-        x = self.channel_attention2(x)
-        x = self.spatial_attention2(x)
+        x = self.channel_attention(x)
+        x = self.spatial_attention(x)
         x = torch.add(x, residual)
         return x
 

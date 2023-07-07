@@ -2,7 +2,6 @@
 import sys
 sys.path.append(".")
 
-import yaml
 import os
 import argparse
 import logging
@@ -10,7 +9,9 @@ import cv2
 import numpy as np
 import torch
 
-from RUSH_CV.Network.SRCNN import SRCNN
+from utils import str2bool 
+
+from RUSH_CV.Network.SRCNN import SRCNN, SRCNNAttention
 from RUSH_CV.utils import load_checkpoint
 
 
@@ -35,7 +36,11 @@ def main(args):
     img_tensor.mul_(1.0 / 255)
 
     logging.debug("Loading model ...")
-    network = SRCNN()
+
+    if args.attention:
+        network = SRCNNAttention()
+    else:
+        network = SRCNN()
     load_checkpoint(os.path.join(ckp_dir, "best.pth"), network)
 
     logging.debug("Predicting ...")
@@ -56,6 +61,8 @@ if __name__ == "__main__":
     pp.add_argument("--ckp_dir", type=str, default="./ckp/")
     pp.add_argument("--image_input_path", type=str, default="examples/sample_inference_01.jpg")
     pp.add_argument("--image_output_path", type=str, default="examples/sample_inference_01_test.png")
+    pp.add_argument("--attention", "-a", type=str2bool, default=False)
+
     pp.add_argument("-s", "--scale", type=int, default=4)
 
     args = pp.parse_args()

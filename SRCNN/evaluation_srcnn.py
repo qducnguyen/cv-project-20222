@@ -7,10 +7,12 @@ import argparse
 import logging
 import torch
 
+from utils import str2bool
+
 from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
-from RUSH_CV.Network.SRCNN import SRCNN
+from RUSH_CV.Network.SRCNN import SRCNN, SRCNNAttention
 from RUSH_CV.Loss.MSELoss import MSELoss
 from RUSH_CV.Evaluation.PSNR import PSNR
 from RUSH_CV.Evaluation.SSIM import SSIM
@@ -50,7 +52,10 @@ def main(args):
                                   drop_last=False)
 
     # Network
-    network = SRCNN()
+    if args.attention:
+        network = SRCNNAttention()
+    else:
+        network = SRCNN()
 
     # Loss
     criterion = MSELoss()
@@ -98,6 +103,7 @@ if __name__ == '__main__':
     pp = argparse.ArgumentParser(description="Evaluation mode")
     pp.add_argument("--ckp_dir", type=str, default="./ckp/")
     pp.add_argument("--scale", "-s", type=int, default=4)
+    pp.add_argument("--attention", "-a", type=str2bool, default=False)
 
     args = pp.parse_args()
 

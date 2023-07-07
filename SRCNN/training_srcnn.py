@@ -67,7 +67,6 @@ def main(args):
                                   shuffle=False,
                                   drop_last=False)
 
-    # Network
     if args.attention:
         network = SRCNNAttention()
     else:

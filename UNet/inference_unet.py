@@ -1,13 +1,14 @@
 import sys
 sys.path.append(".")
 
+from utils import str2bool
 import numpy as np
 import cv2
 import os
 import argparse
 import logging
 import torch
-from RUSH_CV.Network.UNet import UNet2, UNet4, UNet3
+from RUSH_CV.Network.UNet import UNet2, UNet4, UNet3, UNet2Attention, UNet3Attention, UNet4Attention
 from RUSH_CV.utils import load_checkpoint
 
 
@@ -32,12 +33,21 @@ def main(args):
     img_tensor.mul_(1.0 / 255)
 
     logging.debug("Loading model ...")
-    if args.scale == 2:
-        network = UNet2(3, 3)
-    elif args.scale == 3:
-        network = UNet3(3, 3) #
+    
+    if args.attention:
+        if args.scale == 2:
+            network = UNet2Attention(3, 3)
+        elif args.scale == 3:
+            network = UNet3Attention(3, 3) #
+        else:
+            network = UNet4Attention(3, 3)
     else:
-        network = UNet4(3, 3)
+        if args.scale == 2:
+            network = UNet2(3, 3)
+        elif args.scale == 3:
+            network = UNet3(3, 3) #
+        else:
+            network = UNet4(3, 3)
 
 
     load_checkpoint(os.path.join(ckp_dir, "best.pth"), network)
@@ -64,6 +74,8 @@ if __name__ == '__main__':
     pp.add_argument("--image_input_path", type=str, default="examples/sample_inference_01.jpg")
     pp.add_argument("--image_output_path", type=str, default="examples/sample_inference_01_test.png")
     pp.add_argument("-s", "--scale", type=int, default=4)
+    pp.add_argument("-a", "--attention", type=str2bool, default=False)
+
 
     args = pp.parse_args()
 

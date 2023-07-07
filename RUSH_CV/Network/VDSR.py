@@ -28,16 +28,23 @@ class VDSR(nn.Module):
 
 class VDSRAttention(nn.Module):
     def __init__(self, num_channels, base_channels, num_residuals):
-        super(VDSR, self).__init__()
+        super(VDSRAttention, self).__init__()
 
         self.input_conv = nn.Sequential(nn.Conv2d(num_channels, base_channels, kernel_size=3, stride=1, padding=1, bias=False), 
                                         nn.ReLU(inplace=True),
                                         )
-        self.residual_layers = nn.Sequential(*[nn.Sequential(nn.Conv2d(base_channels, base_channels, kernel_size=3, stride=1, padding=1, bias=False), 
+        residual_layers = []
+        for idx in range(num_residuals):
+            if idx != 0 and idx % 4 == 0:
+                residual_layers.append(nn.Sequential(nn.Conv2d(base_channels, base_channels, kernel_size=3, stride=1, padding=1, bias=False), 
                                                              nn.ReLU(inplace=True),
                                                              ChannelAttention(base_channels, 8),
-                                                             SpatialAttention(7)
-                                                             ) for _ in range(num_residuals)])
+                                                             SpatialAttention(7)))
+            else:
+                residual_layers.append(nn.Sequential(nn.Conv2d(base_channels, base_channels, kernel_size=3, stride=1, padding=1, bias=False), 
+                                                                nn.ReLU(inplace=True)))
+        
+        self.residual_layers = nn.Sequential(*residual_layers)
         
         self.output_conv = nn.Conv2d(base_channels, num_channels, kernel_size=3, stride=1, padding=1, bias=False)
 
@@ -54,24 +61,6 @@ class VDSRAttention(nn.Module):
         return x
 
 
-# def weights_init_kaiming(m):
-#     class_name = m.__class__.__name__
-#     if class_name.find('Linear') != -1:
-#         nn.init.kaiming_normal_(m.weight)
-#         if m.bias is not None:
-#             m.bias.data.zero_()
-#     elif class_name.find('Conv2d') != -1:
-#         nn.init.kaiming_normal_(m.weight)
-#         if m.bias is not None:
-#             m.bias.data.zero_()
-#     elif class_name.find('ConvTranspose2d') != -1:
-#         nn.init.kaiming_normal_(m.weight)
-#         if m.bias is not None:
-#             m.bias.data.zero_()
-#     elif class_name.find('Norm') != -1:
-#         m.weight.data.normal_(1.0, 0.02)
-#         if m.bias is not None:
-#             m.bias.data.zero_()
 
 def _initialize_weights(self):
     for module in self.modules():
