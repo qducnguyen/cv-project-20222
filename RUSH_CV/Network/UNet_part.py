@@ -83,11 +83,11 @@ class outconv(nn.Module):
 
 
 class up_s(nn.Module):
-    def __init__(self, in_ch, out_ch):
+    def __init__(self, in_ch, out_ch, up_size=2):
         super(up_s, self).__init__()
         self.upconv = nn.Sequential(
             #nn.Upsample(scale_factor=2, mode='bilinear',align_corners=True),
-            nn.ConvTranspose2d(in_ch, in_ch, 2, stride=2),
+            nn.ConvTranspose2d(in_ch, in_ch, up_size, stride=up_size),
             one_conv(in_ch, out_ch)
         )
 

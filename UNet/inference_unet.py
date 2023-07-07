@@ -7,7 +7,7 @@ import os
 import argparse
 import logging
 import torch
-from RUSH_CV.Network.UNet import UNet2, UNet4, UNet8
+from RUSH_CV.Network.UNet import UNet2, UNet4, UNet3
 from RUSH_CV.utils import load_checkpoint
 
 
@@ -41,7 +41,7 @@ def main():
     if args.scale == 2:
         network = UNet2(3, 3)
     elif args.scale == 3:
-        network = UNet8(3, 3) #
+        network = UNet3(3, 3) #
     else:
         network = UNet4(3, 3)
 

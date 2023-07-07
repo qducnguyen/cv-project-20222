@@ -12,7 +12,7 @@ from tqdm.auto import tqdm
 from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
-from RUSH_CV.Network.UNet import UNet2, UNet4, UNet8
+from RUSH_CV.Network.UNet import UNet2, UNet4, UNet3
 from RUSH_CV.utils import RunningAverage, save_checkpoint, load_checkpoint
 from RUSH_CV.Optimizer.Adam import Adam
 from RUSH_CV.Loss.MSELoss import MSELoss
@@ -90,7 +90,7 @@ def main():
     if args.scale == 2:
         network = UNet2(3, 3)
     elif args.scale == 3:
-        network = UNet8(3, 3) #
+        network = UNet3(3, 3) #
     else:
         network = UNet4(3, 3)
 
