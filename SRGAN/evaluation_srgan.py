@@ -7,12 +7,12 @@ import argparse
 import logging
 import torch
 
+from utils import str2bool
 from tqdm.auto import tqdm
-
 from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
-from RUSH_CV.Network.SRGAN import Generator
+from RUSH_CV.Network.SRGAN import Generator, GeneratorAttention
 from RUSH_CV.utils import load_checkpoint
 from RUSH_CV.Evaluation.PSNR import PSNR
 from RUSH_CV.Evaluation.SSIM import SSIM
@@ -50,7 +50,10 @@ def main(args):
                                   drop_last=False)
 
     # Network
-    networkG = Generator(scale_factor=args.scale)
+    if args.attention:
+        networkG = GeneratorAttention(scale_factor=args.scale)
+    else:
+        networkG = Generator(scale_factor=args.scale)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     networkG.to(device)
 
@@ -131,6 +134,8 @@ if __name__ == '__main__':
 
     pp.add_argument("--ckp_dir", type=str, default="./ckp/")
     pp.add_argument("--scale", type=int, default=4)
+    pp.add_argument("-a", "--attention", type=str2bool, default=False)
+
 
     args = pp.parse_args()
 

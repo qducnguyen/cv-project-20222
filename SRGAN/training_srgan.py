@@ -12,7 +12,7 @@ from tqdm.auto import tqdm
 from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
-from RUSH_CV.Network.SRGAN import Generator, Discriminator
+from RUSH_CV.Network.SRGAN import Generator, Discriminator, GeneratorAttention
 from RUSH_CV.Loss.GANLoss import GeneratorLoss
 from RUSH_CV.utils import RunningAverage, save_checkpoint, load_checkpoint
 from RUSH_CV.Optimizer.Adam import Adam
@@ -74,7 +74,11 @@ def main(args):
                                   drop_last=False)
 
     # Network
-    networkG = Generator(scale_factor=args.scale)
+    if args.attention:
+        networkG = GeneratorAttention(scale_factor=args.scale)
+    else:
+        networkG = Generator(scale_factor=args.scale)
+    
     networkD = Discriminator()
 
     # Loss
@@ -260,6 +264,8 @@ if __name__ == '__main__':
     pp.add_argument("--batch_size_train", type=int, default=4)
     pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
     pp.add_argument("--patch_size",type=int,default=96)
+    pp.add_argument("-a", "--attention", type=str2bool, default=False)
+
 
     pp.add_argument("--lr", type=float, default=2e-5)
     pp.add_argument("--num_epoch", type=int, default=30)

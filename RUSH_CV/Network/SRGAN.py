@@ -1,6 +1,7 @@
 import math
 import torch
 from torch import nn
+from .attention import SpatialAttention, ChannelAttention
 
 
 class Generator(nn.Module):
@@ -19,6 +20,47 @@ class Generator(nn.Module):
         self.block7 = nn.Sequential(
             nn.Conv2d(64, 64, kernel_size=3, padding=1),
             nn.BatchNorm2d(64)
+        )
+
+        if scale_factor == 3:
+            block8 = [UpsampleBLock(64, 3)]
+        
+        else:
+            upsample_block_num = int(math.log(scale_factor, 2))
+            block8 = [UpsampleBLock(64, 2) for _ in range(upsample_block_num)]
+            
+        block8.append(nn.Conv2d(64, 3, kernel_size=9, padding=4))
+        self.block8 = nn.Sequential(*block8)
+
+    def forward(self, x):
+        block1 = self.block1(x)
+        block2 = self.block2(block1)
+        block3 = self.block3(block2)
+        block4 = self.block4(block3)
+        block5 = self.block5(block4)
+        block6 = self.block6(block5)
+        block7 = self.block7(block6)
+        block8 = self.block8(block1 + block7)
+
+        return (torch.tanh(block8) + 1) / 2
+    
+
+class GeneratorAttention(nn.Module):
+    def __init__(self, scale_factor):
+
+        super(GeneratorAttention, self).__init__()
+        self.block1 = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=9, padding=4),
+            nn.PReLU()
+        )
+        self.block2 = ResidualBlockAttention(64)
+        self.block3 = ResidualBlockAttention(64)
+        self.block4 = ResidualBlockAttention(64)
+        self.block5 = ResidualBlockAttention(64)
+        self.block6 = ResidualBlockAttention(64)
+        self.block7 = nn.Sequential(
+            nn.Conv2d(64, 64, kernel_size=3, padding=1),
+            # nn.BatchNorm2d(64)
         )
 
         if scale_factor == 3:
@@ -90,6 +132,8 @@ class Discriminator(nn.Module):
         return torch.sigmoid(self.net(x).view(batch_size))
 
 
+
+
 class ResidualBlock(nn.Module):
     def __init__(self, channels):
         super(ResidualBlock, self).__init__()
@@ -107,6 +151,28 @@ class ResidualBlock(nn.Module):
         residual = self.bn2(residual)
 
         return x + residual
+    
+
+    
+class ResidualBlockAttention(nn.Module):
+    def __init__(self, channels):
+        super(ResidualBlockAttention, self).__init__()
+        self.conv1 = nn.Conv2d(channels, channels, kernel_size=3, padding=1)
+        self.prelu = nn.PReLU()
+        self.conv2 = nn.Conv2d(channels, channels, kernel_size=3, padding=1)
+        self.channel_attention = ChannelAttention(channels, 8)
+        self.spatial_attention = SpatialAttention(7)
+
+    def forward(self, x):
+        residual = self.conv1(x)
+        residual = self.prelu(residual)
+        residual = self.conv2(residual)
+        residual = self.channel_attention(residual)
+        residual = self.spatial_attention(residual)
+        
+        return x + residual
+
+
 
 
 class UpsampleBLock(nn.Module):
