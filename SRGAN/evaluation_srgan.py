@@ -18,18 +18,13 @@ from RUSH_CV.Evaluation.PSNR import PSNR
 from RUSH_CV.Evaluation.SSIM import SSIM
 
 
-pp = argparse.ArgumentParser(description="Evaluation mode")
-
-pp.add_argument("--ckp_dir", type=str, default="../ckp/SRGAN/")
-pp.add_argument("--scale", type=int, default=4)
-
-args = pp.parse_args()
-
-def main():
+def main(args):
 
     seed_everything(73)
 
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+
+    ckp_dir = os.path.join(args.ckp_dir,  "SRGAN", "x" + str(args.scale))
 
     
     valid_dataset = PexelsFlowers(data_np_path=f'data/preprocess/pexels_flowers_valid_x{args.scale}.npy',
@@ -59,7 +54,7 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     networkG.to(device)
 
-    load_checkpoint(os.path.join(args.ckp_dir, "best.pth"), networkG)
+    load_checkpoint(os.path.join(ckp_dir, "best.pth"), networkG)
 
     test_evaluation = {"PSNR": PSNR(), "SSIM":SSIM()} 
 
@@ -131,5 +126,14 @@ def main():
     logging.info(f"Test performance: {performance}")
 
 if __name__ == '__main__':
-    main()
+        
+    pp = argparse.ArgumentParser(description="Evaluation mode")
+
+    pp.add_argument("--ckp_dir", type=str, default="./ckp/")
+    pp.add_argument("--scale", type=int, default=4)
+
+    args = pp.parse_args()
+
+
+    main(args)
 

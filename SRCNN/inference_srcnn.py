@@ -27,7 +27,7 @@ args = pp.parse_args()
 def main():
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
-    ckp_dir = os.path.join(args.ckp_dir,  "SRCNN", args.scale + "-a")
+    ckp_dir = os.path.join(args.ckp_dir, "SRCNN", "x" + str(args.scale))
 
     logging.debug("Detecting device ...")
     if torch.cuda.is_available():

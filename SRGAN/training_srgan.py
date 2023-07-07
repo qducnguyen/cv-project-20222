@@ -19,25 +19,8 @@ from RUSH_CV.Optimizer.Adam import Adam
 from RUSH_CV.Evaluation.PSNR import PSNR
 from RUSH_CV.Evaluation.SSIM import SSIM
 
-pp = argparse.ArgumentParser(description="Testing")
 
-pp.add_argument("--debug", type=str2bool, default=False)
-pp.add_argument("--key_metric", type=str, default="PSNR")
-pp.add_argument("--ckp_dir", type=str, default="../ckp/SRGAN/")
-pp.add_argument("-s", "--scale", type=int, default=4)
-pp.add_argument("--batch_size_train", type=int, default=4)
-pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
-pp.add_argument("--patch_size",type=int,default=96)
-
-pp.add_argument("--lr", type=float, default=2e-5)
-pp.add_argument("--num_epoch", type=int, default=30)
-pp.add_argument("-d", "--device", type=int, default=0)
-
-
-args = pp.parse_args()
-
-
-def main():
+def main(args):
 
     # Seed everything
     seed_everything(73)
@@ -47,6 +30,10 @@ def main():
 
     # DEBUG: set logging
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+
+
+    ckp_dir = os.path.join(args.ckp_dir,  "SRGAN", "x" + str(args.scale))
+
 
     # Data
     train_dataset = PexelsFlowers(data_np_path=f'data/preprocess/pexels_flowers_train_x{args.scale}.npy',
@@ -218,7 +205,7 @@ def main():
                     model=networkG,
                     optimizer= optimizerG,
                     is_best=is_best_model,
-                    checkpoint_path=args.ckp_dir)
+                    checkpoint_path=ckp_dir)
 
 
     logging.info(f"Best valid performance on {key_metric} : {best_value_key_metric}")
@@ -228,7 +215,7 @@ def main():
 
     test_evaluation = {"PSNR": PSNR(), "SSIM": SSIM()} # Dictionary  must be
 
-    load_checkpoint(os.path.join(args.ckp_dir, "best.pth"), networkG)
+    load_checkpoint(os.path.join(ckp_dir, "best.pth"), networkG)
     networkG.eval()
 
     with torch.no_grad():
@@ -263,7 +250,25 @@ def main():
     logging.info(f"Test performance: {performance}")
 
 if __name__ == '__main__':
-    main()
+    
+    pp = argparse.ArgumentParser(description="Testing")
+
+    pp.add_argument("--debug", type=str2bool, default=False)
+    pp.add_argument("--key_metric", type=str, default="PSNR")
+    pp.add_argument("--ckp_dir", type=str, default="./ckp/")
+    pp.add_argument("-s", "--scale", type=int, default=4)
+    pp.add_argument("--batch_size_train", type=int, default=4)
+    pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
+    pp.add_argument("--patch_size",type=int,default=96)
+
+    pp.add_argument("--lr", type=float, default=2e-5)
+    pp.add_argument("--num_epoch", type=int, default=30)
+    pp.add_argument("-d", "--device", type=int, default=0)
+
+
+    args = pp.parse_args()
+
+    main(args)
 
 
 

@@ -11,19 +11,13 @@ from RUSH_CV.Network.UNet import UNet2, UNet4, UNet3
 from RUSH_CV.utils import load_checkpoint
 
 
-pp = argparse.ArgumentParser(description="Inference")
-
-pp.add_argument("--ckp_dir", type=str, default="../ckp/UNet/")
-pp.add_argument("--image_input_path", type=str, default="examples/sample_inference_01.jpg")
-pp.add_argument("--image_output_path", type=str, default="examples/sample_inference_01_test.png")
-pp.add_argument("-s", "--scale", type=int, default=4)
-
-args = pp.parse_args()
-
-
-def main():
+def main(args):
 
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+
+
+    ckp_dir = os.path.join(args.ckp_dir,  "UNet", "x" + str(args.scale))
+    
 
     logging.debug("Detecting device ...")
     if torch.cuda.is_available():
@@ -46,7 +40,7 @@ def main():
         network = UNet4(3, 3)
 
 
-    load_checkpoint(os.path.join(args.ckp_dir, "best.pth"), network)
+    load_checkpoint(os.path.join(ckp_dir, "best.pth"), network)
 
     logging.debug("Predicting ...")
     with torch.no_grad():
@@ -62,4 +56,16 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+
+        
+    pp = argparse.ArgumentParser(description="Inference")
+
+    pp.add_argument("--ckp_dir", type=str, default="./ckp/")
+    pp.add_argument("--image_input_path", type=str, default="examples/sample_inference_01.jpg")
+    pp.add_argument("--image_output_path", type=str, default="examples/sample_inference_01_test.png")
+    pp.add_argument("-s", "--scale", type=int, default=4)
+
+    args = pp.parse_args()
+
+
+    main(args)

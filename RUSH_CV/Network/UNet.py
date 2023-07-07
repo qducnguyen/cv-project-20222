@@ -49,7 +49,7 @@ class UNet2(nn.Module):
 
 class UNet3(nn.Module):
     def __init__(self, n_channels, n_classes):
-        super(UNet2, self).__init__()
+        super(UNet3, self).__init__()
         self.inc = inconv(n_channels, 64)
         self.down1 = down(64, 128)
         self.down2 = down(128, 256)

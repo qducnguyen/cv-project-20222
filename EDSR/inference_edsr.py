@@ -12,18 +12,13 @@ import torch
 from RUSH_CV.Network.EDSR import EDSR
 from RUSH_CV.utils import load_checkpoint
 
-pp = argparse.ArgumentParser(description="Inference")
 
-pp.add_argument("--ckp_dir", type=str, default="./ckp/EDSR/")
-pp.add_argument("--image_input_path", type=str, default="examples/sample_inference_01.jpg")
-pp.add_argument("--image_output_path", type=str, default="examples/sample_inference_01_test.png")
-pp.add_argument("-s", "--scale", type=int, default=4)
 
-args = pp.parse_args()
-
-def main():
+def main(args):
 
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+
+    ckp_dir = os.path.join(args.ckp_dir,  "EDSR", "x" + str(args.scale))
 
     logging.debug("Detecting device ...")
     if torch.cuda.is_available():
@@ -54,4 +49,15 @@ def main():
     logging.info(f"Output image shape of {result_img.shape} stored at {args.image_output_path}")
 
 if __name__ == "__main__":
-    main()
+
+    pp = argparse.ArgumentParser(description="Inference")
+
+    pp.add_argument("--ckp_dir", type=str, default="./ckp/")
+    pp.add_argument("--image_input_path", type=str, default="examples/sample_inference_01.jpg")
+    pp.add_argument("--image_output_path", type=str, default="examples/sample_inference_01_test.png")
+    pp.add_argument("-s", "--scale", type=int, default=4)
+
+    args = pp.parse_args()
+
+    main(args)
+
