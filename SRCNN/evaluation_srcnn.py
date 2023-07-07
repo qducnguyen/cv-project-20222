@@ -97,7 +97,7 @@ if __name__ == '__main__':
     
     pp = argparse.ArgumentParser(description="Evaluation mode")
     pp.add_argument("--ckp_dir", type=str, default="./ckp/")
-    pp.add_argument("--scale", type=int, default=4)
+    pp.add_argument("--scale", "-s", type=int, default=4)
 
     args = pp.parse_args()
 
