@@ -10,7 +10,7 @@ from utils import str2bool
 from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
-from RUSH_CV.Network.SRCNN import SRCNN
+from RUSH_CV.Network.SRCNN import SRCNN, SRCNNAttention
 from RUSH_CV.Loss.MSELoss import MSELoss
 from RUSH_CV.Optimizer.Adam import Adam
 from RUSH_CV.Evaluation.PSNR import PSNR
@@ -67,7 +67,10 @@ def main(args):
                                   shuffle=False,
                                   drop_last=False)
 
-    network = SRCNN()
+    if args.attention:
+        network = SRCNNAttention()
+    else:
+        network = SRCNN()
     # Loss
     criterion = MSELoss()
 
