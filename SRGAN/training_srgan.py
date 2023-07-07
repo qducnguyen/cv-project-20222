@@ -176,7 +176,7 @@ def main():
 
         with torch.no_grad():
             with tqdm(total=len(valid_dataloader)) as t:
-                for idx, data, target in tqdm(valid_dataloader):
+                for idx, data, target in valid_dataloader:
 
                     lr = data.to(device)
                     hr = target.to(device)
