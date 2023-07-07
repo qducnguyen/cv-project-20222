@@ -25,7 +25,7 @@ pp.add_argument("--debug", type=str2bool, default=False)
 pp.add_argument("--key_metric", type=str, default="PSNR")
 pp.add_argument("--ckp_dir", type=str, default="../ckp/SRGAN/")
 pp.add_argument("-s", "--scale", type=int, default=4)
-pp.add_argument("--batch_size_train", type=int, default=64)
+pp.add_argument("--batch_size_train", type=int, default=4)
 pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
 pp.add_argument("--patch_size",type=int,default=96)
 
@@ -175,19 +175,23 @@ def main():
         networkG.eval()
 
         with torch.no_grad():
-            for idx, data, target in tqdm(valid_dataloader):
+            with tqdm(total=len(valid_dataloader)) as t:
+                for idx, data, target in tqdm(valid_dataloader):
 
-                lr = data.to(device)
-                hr = target.to(device)
-                sr = networkG(lr)
+                    lr = data.to(device)
+                    hr = target.to(device)
+                    sr = networkG(lr)
 
-                idx = idx.detach()
-                lr = lr.detach()
-                hr = hr.detach()
-                sr = sr.detach()
+                    idx = idx.detach()
+                    lr = lr.detach()
+                    hr = hr.detach()
+                    sr = sr.detach()
 
-                for _ , val in evaluation.items():
-                    val.update(hr, sr)
+                    for _ , val in evaluation.items():
+                        val.update(hr, sr)
+
+                    t.set_postfix(**{u:v() for u, v in evaluation.items()})
+                    t.update()
                 
 
             performance = {}

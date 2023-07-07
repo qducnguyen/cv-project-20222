@@ -210,7 +210,7 @@ class BaseTrainer():
 
                     self.end_predict_batch()
 
-                    t.set_postfix(key_metric=self.evaluation[self.key_metric]())
+                    t.set_postfix(**{u:v() for u, v in self.evaluation.items()})
                     t.update()
 
     @torch.no_grad()

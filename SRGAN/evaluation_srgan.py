@@ -68,19 +68,23 @@ def main():
     logging.info("Evaluation on " + str(device))
 
     with torch.no_grad():
-        for idx, data, target in tqdm(valid_dataloader):
+        with tqdm(total=len(valid_dataloader)) as t:
+            for idx, data, target in valid_dataloader:
 
-            lr = data.to(device)
-            hr = target.to(device)
-            sr = networkG(lr)
+                lr = data.to(device)
+                hr = target.to(device)
+                sr = networkG(lr)
 
-            idx = idx.detach()
-            lr = lr.detach()
-            hr = hr.detach()
-            sr = sr.detach()
+                idx = idx.detach()
+                lr = lr.detach()
+                hr = hr.detach()
+                sr = sr.detach()
 
-            for _ , val in test_evaluation.items():
-                val.update(hr, sr)
+                for _ , val in test_evaluation.items():
+                    val.update(hr, sr)
+                
+                t.set_postfix(**{u:v() for u, v in test_evaluation.items()})
+                t.update()
 
 
         performance = {}
@@ -94,21 +98,26 @@ def main():
     logging.info(f"Valid performance: {performance}")
 
 
+    test_evaluation = {"PSNR": PSNR(), "SSIM":SSIM()} 
+
     with torch.no_grad():
-        for idx, data, target in tqdm(test_dataloader):
+        with tqdm(total=len(test_dataloader)) as t:
+            for idx, data, target in test_dataloader:
 
-            lr = data.to(device)
-            hr = target.to(device)
-            sr = networkG(lr)
+                lr = data.to(device)
+                hr = target.to(device)
+                sr = networkG(lr)
 
-            idx = idx.detach()
-            lr = lr.detach()
-            hr = hr.detach()
-            sr = sr.detach()
+                idx = idx.detach()
+                lr = lr.detach()
+                hr = hr.detach()
+                sr = sr.detach()
 
-            for _ , val in test_evaluation.items():
-                val.update(hr, sr)
+                for _ , val in test_evaluation.items():
+                    val.update(hr, sr)
 
+                t.set_postfix(**{u:v() for u, v in test_evaluation.items()})
+                t.update()
 
         performance = {}
         for key , val in test_evaluation.items():
