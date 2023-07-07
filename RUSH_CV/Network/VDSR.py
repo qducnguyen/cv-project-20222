@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from .attention import ChannelAttention, SpatialAttention
+from math import sqrt
 
 
 
@@ -14,7 +15,7 @@ class VDSR(nn.Module):
 
     def weight_init(self):
         for m in self._modules:
-            weights_init_kaiming(m)
+            _initialize_weights(m)
 
     def forward(self, x):
         residual = x
@@ -42,7 +43,7 @@ class VDSRAttention(nn.Module):
 
     def weight_init(self):
         for m in self._modules:
-            weights_init_kaiming(m)
+            _initialize_weights(m)
 
     def forward(self, x):
         residual = x
@@ -53,21 +54,26 @@ class VDSRAttention(nn.Module):
         return x
 
 
-def weights_init_kaiming(m):
-    class_name = m.__class__.__name__
-    if class_name.find('Linear') != -1:
-        nn.init.kaiming_normal_(m.weight)
-        if m.bias is not None:
-            m.bias.data.zero_()
-    elif class_name.find('Conv2d') != -1:
-        nn.init.kaiming_normal_(m.weight)
-        if m.bias is not None:
-            m.bias.data.zero_()
-    elif class_name.find('ConvTranspose2d') != -1:
-        nn.init.kaiming_normal_(m.weight)
-        if m.bias is not None:
-            m.bias.data.zero_()
-    elif class_name.find('Norm') != -1:
-        m.weight.data.normal_(1.0, 0.02)
-        if m.bias is not None:
-            m.bias.data.zero_()
+# def weights_init_kaiming(m):
+#     class_name = m.__class__.__name__
+#     if class_name.find('Linear') != -1:
+#         nn.init.kaiming_normal_(m.weight)
+#         if m.bias is not None:
+#             m.bias.data.zero_()
+#     elif class_name.find('Conv2d') != -1:
+#         nn.init.kaiming_normal_(m.weight)
+#         if m.bias is not None:
+#             m.bias.data.zero_()
+#     elif class_name.find('ConvTranspose2d') != -1:
+#         nn.init.kaiming_normal_(m.weight)
+#         if m.bias is not None:
+#             m.bias.data.zero_()
+#     elif class_name.find('Norm') != -1:
+#         m.weight.data.normal_(1.0, 0.02)
+#         if m.bias is not None:
+#             m.bias.data.zero_()
+
+def _initialize_weights(self):
+    for module in self.modules():
+        if isinstance(module, nn.Conv2d):
+            module.weight.data.normal_(0.0, sqrt(2 / (module.kernel_size[0] * module.kernel_size[1] * module.out_channels)))

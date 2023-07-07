@@ -210,7 +210,7 @@ class BaseTrainer():
 
                     self.end_predict_batch()
 
-                    t.set_postfix(key_metric=self.performance[self.key_metric]())
+                    t.set_postfix(key_metric=self.evaluation[self.key_metric]())
                     t.update()
 
     @torch.no_grad()

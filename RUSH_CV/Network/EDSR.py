@@ -51,16 +51,16 @@ class ResnetBlock(nn.Module):
 
     def forward(self, x):
         residual = x
-        x = self.bn(self.conv1(x))
+        x = self.conv1(x)
         x = self.activation(x)
-        x = self.bn(self.conv2(x))
+        x = self.conv2(x)
         x = torch.add(x, residual)
         return x
 
 
 class EDSRAttention(nn.Module):
     def __init__(self, num_channels, base_channel, upscale_factor, num_residuals):
-        super(EDSR, self).__init__()
+        super(EDSRAttention, self).__init__()
 
         self.input_conv = nn.Conv2d(num_channels, base_channel, kernel_size=3, stride=1, padding=1)
 
@@ -74,6 +74,7 @@ class EDSRAttention(nn.Module):
         upscale = []
         for _ in range(int(math.log2(upscale_factor))):
             upscale.append(PixelShuffleBlock(base_channel, base_channel, upscale_factor=2))
+
         self.upscale_layers = nn.Sequential(*upscale)
 
         self.output_conv = nn.Conv2d(base_channel, num_channels, kernel_size=3, stride=1, padding=1)
@@ -96,7 +97,7 @@ class EDSRAttention(nn.Module):
 class ResnetBlockAttention(nn.Module):
 
     def __init__(self, num_channel, kernel=3, stride=1, padding=1):
-        super(ResnetBlock, self).__init__()
+        super(ResnetBlockAttention, self).__init__()
         self.conv1 = nn.Conv2d(num_channel, num_channel, kernel, stride, padding)
         self.conv2 = nn.Conv2d(num_channel, num_channel, kernel, stride, padding)
         # self.bn = nn.BatchNorm2d(num_channel)
