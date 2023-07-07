@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+from .attention import ChannelAttention, SpatialAttention
+
 class one_conv(nn.Module):
     def __init__(self, in_ch, out_ch):
         super(one_conv, self).__init__()
@@ -37,6 +39,26 @@ class down(nn.Module):
     def forward(self, x):
         x = self.mpconv(x)
         return x
+    
+
+
+class down_attention(nn.Module):
+    def __init__(self, in_ch, out_ch):
+        super(down_attention, self).__init__()
+        self.mpconv = nn.Sequential(
+            nn.MaxPool2d(2),
+            one_conv(in_ch, out_ch)
+        )
+
+        self.channel_attention = ChannelAttention(out_ch, 8)
+        self.spatial_attention = SpatialAttention(7)
+
+    def forward(self, x):
+        x = self.mpconv(x)
+        x = self.channel_attention(x)
+        x = self.spatial_attention(x)
+        return x
+
 
 
 class up(nn.Module):
