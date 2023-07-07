@@ -65,9 +65,9 @@ def main(args):
 
     # Network
     if args.attention:
-        network = VDSRAttention(num_channels=3, base_channels=64, num_residuals=6)
+        network = VDSRAttention(num_channels=3, base_channels=64, num_residuals=18)
     else:
-        network = VDSR(num_channels=3, base_channels=64, num_residuals=6)
+        network = VDSR(num_channels=3, base_channels=64, num_residuals=18)
 
     network.weight_init()
     # Loss

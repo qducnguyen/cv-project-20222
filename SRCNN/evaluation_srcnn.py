@@ -25,7 +25,7 @@ def main(args):
 
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
-    ckp_dir = os.path.join(args.ckp_dir,  "SRCNN", args.scale + "-a")
+    ckp_dir = os.path.join(args.ckp_dir,  "SRCNN", str(args.scale))
 
 
     valid_dataset = PexelsFlowers(f'data/preprocess/pexels_flowers_valid_x{args.scale}.npy',
@@ -70,7 +70,7 @@ def main(args):
                          evaluation=evaluation,
                          num_epoch=None,
                          eval_epoch=None,
-                         key_metric=None,
+                         key_metric="PSNR",
                          ckp_dir=ckp_dir)
     
 
