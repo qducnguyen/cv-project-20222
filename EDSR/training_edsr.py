@@ -12,6 +12,7 @@ from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
 from RUSH_CV.Network.EDSR import EDSRAttention, EDSR
 from RUSH_CV.Loss.L1Loss import L1Loss
+from RUSH_CV.Loss.MSELoss import MSELoss
 from RUSH_CV.Optimizer.Adam import Adam
 from RUSH_CV.Evaluation.PSNR import PSNR
 from RUSH_CV.Trainer.CNNTrainer import CNNTrainer

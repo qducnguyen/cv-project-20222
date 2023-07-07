@@ -73,7 +73,7 @@ def main():
                          evaluation=evaluation,
                          num_epoch=None,
                          eval_epoch=None,
-                         key_metric=None,
+                         key_metric="PSNR",
                          ckp_dir=args.ckp_dir)
     
 
