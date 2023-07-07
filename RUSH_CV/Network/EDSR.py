@@ -19,8 +19,13 @@ class EDSR(nn.Module):
         self.mid_conv = nn.Conv2d(base_channel, base_channel, kernel_size=3, stride=1, padding=1)
 
         upscale = []
-        for _ in range(int(math.log2(upscale_factor))):
-            upscale.append(PixelShuffleBlock(base_channel, base_channel, upscale_factor=2))
+
+        if upscale_factor == 3:
+            upscale.append(PixelShuffleBlock(base_channel, base_channel, upscale_factor=3))
+        else:
+            for _ in range(int(math.log2(upscale_factor))):
+                upscale.append(PixelShuffleBlock(base_channel, base_channel, upscale_factor=2))
+
         self.upscale_layers = nn.Sequential(*upscale)
 
         self.output_conv = nn.Conv2d(base_channel, num_channels, kernel_size=3, stride=1, padding=1)

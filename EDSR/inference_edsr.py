@@ -38,7 +38,7 @@ def main():
     img_tensor.mul_(1.0 / 255)
 
     logging.debug("Loading model ...")
-    network = EDSR(num_channels=3, base_channel=64, num_residuals=4 , upscale_factor=args.scale)
+    network = EDSR(num_channels=3, base_channel=64, num_residuals=16, upscale_factor=args.scale)
 
     load_checkpoint(os.path.join(args.ckp_dir, "best.pth"), network)
 

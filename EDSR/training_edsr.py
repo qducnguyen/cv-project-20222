@@ -83,9 +83,9 @@ def main():
 
     # Network
     if args.attention:
-        network = EDSRAttention(num_channels=3, base_channel=64, num_residuals=4 , upscale_factor=args.scale)
+        network = EDSRAttention(num_channels=3, base_channel=64, num_residuals=16, upscale_factor=args.scale)
     else:
-        network = EDSR(num_channels=3, base_channel=64, num_residuals=4 , upscale_factor=args.scale)
+        network = EDSR(num_channels=3, base_channel=64, num_residuals=16, upscale_factor=args.scale)
         
     network.weight_init()
     # Loss
