@@ -83,7 +83,8 @@ def main():
                 for _ , val in test_evaluation.items():
                     val.update(hr, sr)
                 
-                t.set_postfix(**{u:v() for u, v in test_evaluation.items()})
+                t.set_postfix(**{u:f"{v():.3f}" for u, v in test_evaluation.items()})
+
                 t.update()
 
 
@@ -116,7 +117,7 @@ def main():
                 for _ , val in test_evaluation.items():
                     val.update(hr, sr)
 
-                t.set_postfix(**{u:v() for u, v in test_evaluation.items()})
+                t.set_postfix(**{u:f"{v():.3f}" for u, v in test_evaluation.items()})
                 t.update()
 
         performance = {}

@@ -190,7 +190,7 @@ def main():
                     for _ , val in evaluation.items():
                         val.update(hr, sr)
 
-                    t.set_postfix(**{u:v() for u, v in evaluation.items()})
+                    t.set_postfix(**{u:f"{v():.3f}" for u, v in evaluation.items()})
                     t.update()
                 
 
@@ -232,19 +232,24 @@ def main():
     networkG.eval()
 
     with torch.no_grad():
-        for idx, data, target in tqdm(test_dataloader):
+        with tqdm(total=len(test_dataloader)) as t:
+            for idx, data, target in test_dataloader:
 
-            lr = data.to(device)
-            hr = target.to(device)
-            sr = networkG(lr)
+                lr = data.to(device)
+                hr = target.to(device)
+                sr = networkG(lr)
 
-            idx = idx.detach()
-            lr = lr.detach()
-            hr = hr.detach()
-            sr = sr.detach()
+                idx = idx.detach()
+                lr = lr.detach()
+                hr = hr.detach()
+                sr = sr.detach()
 
-            for _ , val in test_evaluation.items():
-                val.update(hr, sr)
+                for _ , val in test_evaluation.items():
+                    val.update(hr, sr)
+
+                t.set_postfix(**{u:f"{v():.3f}" for u, v in test_evaluation.items()})
+
+                t.update()
 
 
         performance = {}
