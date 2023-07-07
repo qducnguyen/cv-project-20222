@@ -81,7 +81,8 @@ def main():
                                   drop_last=False)
 
     # Network
-    network = EDSR(num_channels=3, base_channel=64, num_residuals=4 , upscale_factor=args.scale)
+    # network = EDSR(num_channels=3, base_channel=64, num_residuals=4 , upscale_factor=args.scale)
+    network = EDSR(n_resblocks=32, n_feats=256, scale=2, n_colors=3, rgb_range=255, res_scale=0.1)
     network.weight_init()
     # Loss
     criterion = L1Loss()
