@@ -54,7 +54,7 @@ def main():
                                   drop_last=False)
 
     # Network
-    network = VDSR(num_channels=3, base_channels=64, num_residuals=6)
+    network = VDSR(num_channels=3, base_channels=64, num_residuals=18)
 
     # Loss
     criterion = MSELoss()

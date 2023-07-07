@@ -115,7 +115,7 @@ if __name__ == '__main__':
 
     pp.add_argument("--debug", type=str2bool, default=False)
     pp.add_argument("--key_metric", type=str, default="PSNR")
-    pp.add_argument("--ckp_dir", type=str, default="./ckp/VDSR")
+    pp.add_argument("--ckp_dir", type=str, default="./ckp/VDSR/")
     pp.add_argument("-s", "--scale", type=int, default=4)
     pp.add_argument("--batch_size_train", type=int, default=4)
     pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)

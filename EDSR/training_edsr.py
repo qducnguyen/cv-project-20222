@@ -90,7 +90,7 @@ def main():
         
     network.weight_init()
     # Loss
-    criterion = MSELoss()
+    criterion = L1Loss()
 
     # Optimizer 
     optimizer = Adam(network.parameters(),lr=args.lr, betas=(0.9, 0.999), eps=1e-8)

@@ -140,8 +140,6 @@ def main():
                 d_loss.backward(retain_graph=True)
                 optimizerD.step()
 
-
-
                 ############################
                 # (2) Update G network: minimize 1-D(G(z)) + Perception Loss + Image Loss + TV Loss
                 ###########################
