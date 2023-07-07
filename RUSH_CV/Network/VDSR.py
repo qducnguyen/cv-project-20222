@@ -14,8 +14,8 @@ class VDSR(nn.Module):
         self.output_conv = nn.Conv2d(base_channels, num_channels, kernel_size=3, stride=1, padding=1, bias=False)
 
     def weight_init(self):
-        for m in self._modules:
-            _initialize_weights(m)
+        # for m in self._modules:
+        _initialize_weights(self)
 
     def forward(self, x):
         residual = x
@@ -42,8 +42,8 @@ class VDSRAttention(nn.Module):
         self.output_conv = nn.Conv2d(base_channels, num_channels, kernel_size=3, stride=1, padding=1, bias=False)
 
     def weight_init(self):
-        for m in self._modules:
-            _initialize_weights(m)
+        # for m in self._modules:
+        _initialize_weights(self)
 
     def forward(self, x):
         residual = x
