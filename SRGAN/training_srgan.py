@@ -25,7 +25,7 @@ pp.add_argument("--debug", type=str2bool, default=False)
 pp.add_argument("--key_metric", type=str, default="PSNR")
 pp.add_argument("--ckp_dir", type=str, default="../ckp/SRGAN/")
 pp.add_argument("-s", "--scale", type=int, default=4)
-pp.add_argument("--batch_size_train", type=int, default=64)
+pp.add_argument("--batch_size_train", type=int, default=4)
 pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
 pp.add_argument("--patch_size",type=int,default=96)
 
@@ -140,8 +140,6 @@ def main():
                 d_loss.backward(retain_graph=True)
                 optimizerD.step()
 
-
-
                 ############################
                 # (2) Update G network: minimize 1-D(G(z)) + Perception Loss + Image Loss + TV Loss
                 ###########################
@@ -177,19 +175,23 @@ def main():
         networkG.eval()
 
         with torch.no_grad():
-            for idx, data, target in tqdm(valid_dataloader):
+            with tqdm(total=len(valid_dataloader)) as t:
+                for idx, data, target in valid_dataloader:
 
-                lr = data.to(device)
-                hr = target.to(device)
-                sr = networkG(lr)
+                    lr = data.to(device)
+                    hr = target.to(device)
+                    sr = networkG(lr)
 
-                idx = idx.detach()
-                lr = lr.detach()
-                hr = hr.detach()
-                sr = sr.detach()
+                    idx = idx.detach()
+                    lr = lr.detach()
+                    hr = hr.detach()
+                    sr = sr.detach()
 
-                for _ , val in evaluation.items():
-                    val.update(hr, sr)
+                    for _ , val in evaluation.items():
+                        val.update(hr, sr)
+
+                    t.set_postfix(**{u:f"{v():.3f}" for u, v in evaluation.items()})
+                    t.update()
                 
 
             performance = {}
@@ -230,19 +232,24 @@ def main():
     networkG.eval()
 
     with torch.no_grad():
-        for idx, data, target in tqdm(test_dataloader):
+        with tqdm(total=len(test_dataloader)) as t:
+            for idx, data, target in test_dataloader:
 
-            lr = data.to(device)
-            hr = target.to(device)
-            sr = networkG(lr)
+                lr = data.to(device)
+                hr = target.to(device)
+                sr = networkG(lr)
 
-            idx = idx.detach()
-            lr = lr.detach()
-            hr = hr.detach()
-            sr = sr.detach()
+                idx = idx.detach()
+                lr = lr.detach()
+                hr = hr.detach()
+                sr = sr.detach()
 
-            for _ , val in test_evaluation.items():
-                val.update(hr, sr)
+                for _ , val in test_evaluation.items():
+                    val.update(hr, sr)
+
+                t.set_postfix(**{u:f"{v():.3f}" for u, v in test_evaluation.items()})
+
+                t.update()
 
 
         performance = {}

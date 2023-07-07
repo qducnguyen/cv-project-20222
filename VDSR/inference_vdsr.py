@@ -42,7 +42,7 @@ def main():
     img_tensor.mul_(1.0 / 255)
 
     logging.debug("Loading model ...")
-    network = VDSR(num_channels=3, base_channels=64, num_residuals=6)
+    network = VDSR(num_channels=3, base_channels=64, num_residuals=18)
     load_checkpoint(os.path.join(args.ckp_dir, "best.pth"), network)
 
     logging.debug("Predicting ...")

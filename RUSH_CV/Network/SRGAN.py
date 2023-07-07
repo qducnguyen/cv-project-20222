@@ -5,7 +5,6 @@ from torch import nn
 
 class Generator(nn.Module):
     def __init__(self, scale_factor):
-        upsample_block_num = int(math.log(scale_factor, 2))
 
         super(Generator, self).__init__()
         self.block1 = nn.Sequential(
@@ -21,7 +20,14 @@ class Generator(nn.Module):
             nn.Conv2d(64, 64, kernel_size=3, padding=1),
             nn.BatchNorm2d(64)
         )
-        block8 = [UpsampleBLock(64, 2) for _ in range(upsample_block_num)]
+
+        if scale_factor == 3:
+            block8 = [UpsampleBLock(64, 3)]
+        
+        else:
+            upsample_block_num = int(math.log(scale_factor, 2))
+            block8 = [UpsampleBLock(64, 2) for _ in range(upsample_block_num)]
+            
         block8.append(nn.Conv2d(64, 3, kernel_size=9, padding=4))
         self.block8 = nn.Sequential(*block8)
 

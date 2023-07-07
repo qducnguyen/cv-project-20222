@@ -10,37 +10,24 @@ from utils import str2bool
 from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
-from RUSH_CV.Network.SRCNN import SRCNN
+from RUSH_CV.Network.SRCNN import SRCNN, SRCNNAttention
 from RUSH_CV.Loss.MSELoss import MSELoss
 from RUSH_CV.Optimizer.Adam import Adam
 from RUSH_CV.Evaluation.PSNR import PSNR
 from RUSH_CV.Trainer.CNNTrainer import CNNTrainer
 
-pp = argparse.ArgumentParser(description="Training SRCNN")
 
-pp.add_argument("--debug", type=str2bool, default=False)
-pp.add_argument("--key_metric", type=str, default="PSNR")
-pp.add_argument("--ckp_dir", type=str, default="./ckp/SRCNN/")
-pp.add_argument("-s", "--scale", type=int, default=4)
-pp.add_argument("--batch_size_train", type=int, default=4)
-pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
-pp.add_argument("--patch_size",type=int,default=64)
-
-pp.add_argument("--lr", type=float, default=1e-4)
-pp.add_argument("--num_epoch", type=int, default=30)
-pp.add_argument("-d", "--device", type=int, default=0)
-
-
-args = pp.parse_args()
-
-
-def main():
+def main(args):
 
     # Seed everything
     seed_everything(73)
 
     # DEBUG: set logging
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+
+    ckp_dir = os.path.join(args.ckp_dir,  "SRCNN", str(args.scale) + "-a" if args.attention else str(args.scale))
+
+
 
     # Data
     train_dataset = PexelsFlowers(data_np_path=f'data/preprocess/pexels_flowers_train_x{args.scale}.npy',
@@ -81,7 +68,10 @@ def main():
                                   drop_last=False)
 
     # Network
-    network = SRCNN()
+    if args.attention:
+        network = SRCNNAttention()
+    else:
+        network = SRCNN()
     # Loss
     criterion = MSELoss()
 
@@ -111,13 +101,13 @@ def main():
                          num_epoch=num_epoch,
                          eval_epoch=eval_epoch,
                          key_metric=args.key_metric,
-                         ckp_dir=args.ckp_dir)
+                         ckp_dir=ckp_dir)
 
 
     trainer.fit()
 
     logging.info("-" * 20)
-    trainer.load_checkpoint(os.path.join(args.ckp_dir, "best.pth"))    
+    trainer.load_checkpoint(os.path.join(ckp_dir, "best.pth"))    
     logging.info("Evaluation on test set ...")
     test_performance = trainer.evaluate(valid=False)
     logging.info("-" * 20)
@@ -126,7 +116,27 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+
+    pp = argparse.ArgumentParser(description="Training SRCNN")
+
+    pp.add_argument("--debug", type=str2bool, default=False)
+    pp.add_argument("--key_metric", type=str, default="PSNR")
+    pp.add_argument("--ckp_dir", type=str, default="./ckp/")
+    pp.add_argument("-s", "--scale", type=int, default=4)
+    pp.add_argument("--batch_size_train", type=int, default=4)
+    pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
+    pp.add_argument("--patch_size",type=int,default=64)
+    pp.add_argument("-a", "--attention", type=str2bool, default=False)
+
+    pp.add_argument("--lr", type=float, default=1e-4)
+    pp.add_argument("--num_epoch", type=int, default=30)
+    pp.add_argument("-d", "--device", type=int, default=0)
+
+
+    args = pp.parse_args()
+
+
+    main(args)
 
 
 

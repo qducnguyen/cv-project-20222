@@ -33,7 +33,6 @@ if __name__ == '__main__':
     pp.add_argument("--image_output_path", type=str, default="examples/sample_inference_01_test.png")
     pp.add_argument("--scale", type=int, default=4)
 
-
     args = pp.parse_args()
 
     main(args)

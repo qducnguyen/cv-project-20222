@@ -10,31 +10,15 @@ from utils import str2bool
 from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
-from RUSH_CV.Network.VDSR import VDSR
+from RUSH_CV.Network.VDSR import VDSR, VDSRAttention
 from RUSH_CV.Loss.MSELoss import MSELoss
 from RUSH_CV.Optimizer.Adam import Adam
 from RUSH_CV.Evaluation.PSNR import PSNR
 from RUSH_CV.Trainer.CNNTrainer import CNNTrainer
 
-pp = argparse.ArgumentParser(description="Training VDSR")
-
-pp.add_argument("--debug", type=str2bool, default=False)
-pp.add_argument("--key_metric", type=str, default="PSNR")
-pp.add_argument("--ckp_dir", type=str, default="./ckp/VDSR")
-pp.add_argument("-s", "--scale", type=int, default=4)
-pp.add_argument("--batch_size_train", type=int, default=4)
-pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
-pp.add_argument("--patch_size",type=int,default=512)
-
-pp.add_argument("--lr", type=float, default=1e-4)
-pp.add_argument("--num_epoch", type=int, default=15)
-pp.add_argument("-d", "--device", type=int, default=0)
 
 
-args = pp.parse_args()
-
-
-def main():
+def main(args):
 
     # Seed everything
     seed_everything(73)
@@ -80,7 +64,11 @@ def main():
                                   drop_last=False)
 
     # Network
-    network = VDSR(num_channels=3, base_channels=64, num_residuals=6)
+    if args.attention:
+        network = VDSRAttention(num_channels=3, base_channels=64, num_residuals=18)
+    else:
+        network = VDSR(num_channels=3, base_channels=64, num_residuals=18)
+
     network.weight_init()
     # Loss
     criterion = MSELoss()
@@ -122,7 +110,26 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+
+    pp = argparse.ArgumentParser(description="Training VDSR")
+
+    pp.add_argument("--debug", type=str2bool, default=False)
+    pp.add_argument("--key_metric", type=str, default="PSNR")
+    pp.add_argument("--ckp_dir", type=str, default="./ckp/VDSR/")
+    pp.add_argument("-s", "--scale", type=int, default=4)
+    pp.add_argument("--batch_size_train", type=int, default=4)
+    pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)
+    pp.add_argument("--patch_size",type=int,default=512)
+    pp.add_argument("-a", "--attention", type=str2bool, default=False)
+
+    pp.add_argument("--lr", type=float, default=1e-4)
+    pp.add_argument("--num_epoch", type=int, default=15)
+    pp.add_argument("-d", "--device", type=int, default=0)
+
+
+    args = pp.parse_args()
+
+    main(args)
 
 
 

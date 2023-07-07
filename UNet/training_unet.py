@@ -12,11 +12,10 @@ from tqdm.auto import tqdm
 from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
-from RUSH_CV.Network.UNet import UNet2, UNet4, UNet8
+from RUSH_CV.Network.UNet import UNet2, UNet4, UNet3
 from RUSH_CV.utils import RunningAverage, save_checkpoint, load_checkpoint
 from RUSH_CV.Optimizer.Adam import Adam
 from RUSH_CV.Loss.MSELoss import MSELoss
-from RUSH_CV.Loss.L1Loss import L1Loss
 from RUSH_CV.Loss.GradientLoss import GradientLoss
 from RUSH_CV.Evaluation.PSNR import PSNR
 from RUSH_CV.Evaluation.SSIM import SSIM
@@ -91,7 +90,7 @@ def main():
     if args.scale == 2:
         network = UNet2(3, 3)
     elif args.scale == 3:
-        network = UNet8(3, 3) #
+        network = UNet3(3, 3) #
     else:
         network = UNet4(3, 3)
 
@@ -100,12 +99,10 @@ def main():
     # Loss
 
     criterion_mse = MSELoss()
-    criterion_l1 = L1Loss()
     criterion_gra = GradientLoss()
 
 
     criterion_mse = criterion_mse.to(device)
-    criterion_l1 = criterion_l1.to(device)
     criterion_gra = criterion_gra.to(device)
     network = network.to(device)
 
@@ -130,9 +127,7 @@ def main():
 
             
             for idx, data, target in train_dataloader:
-                ############################
-                # (1) Update D network: maximize D(x)-1-D(G(z))
-                ###########################
+
                 idx = idx.to(device)
                 target = target.to(device)
                 data = data.to(device)
@@ -141,9 +136,8 @@ def main():
                 prediction = network(data)
 
                 loss_mse = criterion_mse(prediction, target)
-                # loss_l1 = criterion_l1(prediction, target)
-                # loss_gra = criterion_gra(prediction, target)
-                loss = loss_mse 
+                loss_gra = criterion_gra(prediction, target)
+                loss = loss_mse + 0.1 * loss_gra 
                 loss.backward()
                 optimizer.step()
 
@@ -159,20 +153,24 @@ def main():
         network.eval()
 
         with torch.no_grad():
-            for idx, data, target in tqdm(valid_dataloader):
+            with tqdm(total=len(valid_dataloader)) as t:
+                for idx, data, target in valid_dataloader:
 
-                lr = data.to(device)
-                hr = target.to(device)
-                sr = network(lr)
+                    lr = data.to(device)
+                    hr = target.to(device)
+                    sr = network(lr)
 
-                idx = idx.detach()
-                lr = lr.detach()
-                hr = hr.detach()
-                sr = sr.detach()
+                    idx = idx.detach()
+                    lr = lr.detach()
+                    hr = hr.detach()
+                    sr = sr.detach()
 
-                for _ , val in evaluation.items():
-                    val.update(hr, sr)
-                
+                    for _ , val in evaluation.items():
+                        val.update(hr, sr)
+
+                    t.set_postfix(**{u:f"{v():.3f}" for u, v in evaluation.items()})
+
+                    t.update()
 
             performance = {}
             for key , val in evaluation.items():
@@ -212,19 +210,24 @@ def main():
     network.eval()
 
     with torch.no_grad():
-        for idx, data, target in tqdm(test_dataloader):
+        with tqdm(total=len(test_dataloader)) as t:
+            for idx, data, target in test_dataloader:
 
-            lr = data.to(device)
-            hr = target.to(device)
-            sr = network(lr)
+                lr = data.to(device)
+                hr = target.to(device)
+                sr = network(lr)
 
-            idx = idx.detach()
-            lr = lr.detach()
-            hr = hr.detach()
-            sr = sr.detach()
+                idx = idx.detach()
+                lr = lr.detach()
+                hr = hr.detach()
+                sr = sr.detach()
 
-            for _ , val in test_evaluation.items():
-                val.update(hr, sr)
+                for _ , val in test_evaluation.items():
+                    val.update(hr, sr)
+                
+                t.set_postfix(**{u:f"{v():.3f}" for u, v in evaluation.items()})
+                t.update()
+
 
 
         performance = {}
