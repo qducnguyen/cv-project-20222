@@ -3,6 +3,10 @@ import argparse
 import os
 
 from SRCNN.solver import SRCNNTrainer
+from VDSR.solver import VDSRTrainer
+from EDSR.solver import EDSRTrainer
+from SRGAN.solver import SRGANTrainer
+from UNet.solver import UNetTrainer
 
 # ===========================================================
 # Evaluatoin settings
@@ -29,9 +33,17 @@ args = parser.parse_args()
 
 def main():
     if args.model == "bicubic":
-        raise("Bicubic model do not need to be trained.")
+        raise Exception("Bicubic model do not need to be trained.")
     elif args.model == "srcnn":
         trainer = SRCNNTrainer(args)
+    elif args.model == "vdsr":
+        trainer = VDSRTrainer(args)
+    elif args.model == "edsr":
+        trainer = EDSRTrainer(args)
+    elif args.model == "srgan":
+        trainer = SRGANTrainer(args)
+    elif args.model == "unet":
+        trainer = UNetTrainer(args)
     else:
         raise Exception("The model does not exist")
     

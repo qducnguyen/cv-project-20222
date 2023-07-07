@@ -2,6 +2,12 @@ from utils import str2bool
 import argparse
 
 from Bicubic.solver import BicubicInferencer
+from SRCNN.solver import SRCNNInferencer
+from VDSR.solver import VDSRInferencer
+from EDSR.solver import EDSRInferencer
+from SRGAN.solver import SRGANInferencer
+from UNet.solver import UNetInferencer
+
 
 # ===========================================================
 # Evaluatoin settings
@@ -21,12 +27,21 @@ args = parser.parse_args()
 
 def main():
     if args.model == "bicubic":
-        evaluator  = BicubicInferencer(args)
+        inferencer  = BicubicInferencer(args)
+    elif args.model == "srcnn":
+        inferencer = SRCNNInferencer(args)
+    elif args.model == "vdsr":
+        inferencer = VDSRInferencer(args)
+    elif args.model == "edsr":
+        inferencer = EDSRInferencer(args)
+    elif args.model == "srgan":
+        inferencer = SRGANInferencer(args)
+    elif args.model == "unet":
+        inferencer = UNetInferencer(args)
     else:
-        raise Exception("The model does not exist")
+        raise Exception("The model does not exist")    
     
-    evaluator.run()
-
+    inferencer.run()
 
 
 if __name__ == '__main__':

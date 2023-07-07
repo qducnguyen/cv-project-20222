@@ -26,6 +26,9 @@ def main(args):
     # DEBUG: set logging
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
+    ckp_dir = os.path.join(args.ckp_dir,  "VDSR", "x" + str(args.scale))
+
+
     # Data
     train_dataset = PexelsFlowers(data_np_path=f'data/preprocess/pexels_flowers_train_x{args.scale}.npy',
                                     patch_size=args.patch_size,
@@ -95,13 +98,13 @@ def main(args):
                          num_epoch=num_epoch,
                          eval_epoch=eval_epoch,
                          key_metric=args.key_metric,
-                         ckp_dir=args.ckp_dir)
+                         ckp_dir=ckp_dir)
 
 
     trainer.fit()
 
     logging.info("-" * 20)
-    trainer.load_checkpoint(os.path.join(args.ckp_dir, "best.pth"))    
+    trainer.load_checkpoint(os.path.join(ckp_dir, "best.pth"))    
     logging.info("Evaluation on test set ...")
     test_performance = trainer.evaluate(valid=False)
     logging.info("-" * 20)
@@ -115,7 +118,7 @@ if __name__ == '__main__':
 
     pp.add_argument("--debug", type=str2bool, default=False)
     pp.add_argument("--key_metric", type=str, default="PSNR")
-    pp.add_argument("--ckp_dir", type=str, default="./ckp/VDSR/")
+    pp.add_argument("--ckp_dir", type=str, default="./ckp/")
     pp.add_argument("-s", "--scale", type=int, default=4)
     pp.add_argument("--batch_size_train", type=int, default=4)
     pp.add_argument("--num_worker",type=int,default=os.cpu_count() // 2)

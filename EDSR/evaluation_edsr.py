@@ -18,18 +18,16 @@ from RUSH_CV.Evaluation.SSIM import SSIM
 from RUSH_CV.Trainer.CNNTrainer import CNNTrainer
 
 
-pp = argparse.ArgumentParser(description="Evaluation mode")
 
-pp.add_argument("--ckp_dir", type=str, default="./ckp/EDSR/")
-pp.add_argument("--scale", type=int, default=4)
-
-args = pp.parse_args()
-
-def main():
+def main(args):
 
     seed_everything(73)
 
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+
+
+    ckp_dir = os.path.join(args.ckp_dir,  "EDSR", "x" + str(args.scale))
+
 
     valid_dataset = PexelsFlowers(f'data/preprocess/pexels_flowers_valid_x{args.scale}.npy',
                                    patch_size=None,
@@ -74,10 +72,10 @@ def main():
                          num_epoch=None,
                          eval_epoch=None,
                          key_metric="PSNR",
-                         ckp_dir=args.ckp_dir)
+                         ckp_dir=ckp_dir)
     
 
-    trainer.load_checkpoint(os.path.join(args.ckp_dir, "best.pth"))
+    trainer.load_checkpoint(os.path.join(ckp_dir, "best.pth"))
 
     if trainer.device is  None:
         trainer.device = 'cpu'
@@ -95,5 +93,13 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+
+    pp = argparse.ArgumentParser(description="Evaluation mode")
+
+    pp.add_argument("--ckp_dir", type=str, default="./ckp/")
+    pp.add_argument("--scale", type=int, default=4)
+
+    args = pp.parse_args()
+
+    main(args)
 
