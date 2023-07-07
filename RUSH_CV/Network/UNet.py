@@ -48,7 +48,7 @@ class UNet2(nn.Module):
 
 class UNet2Attention(nn.Module):
     def __init__(self, n_channels, n_classes):
-        super(UNet2, self).__init__()
+        super(UNet2Attention, self).__init__()
         self.inc = inconv(n_channels, 64)
         self.down1 = down_attention(64, 128)
         self.down2 = down_attention(128, 256)
@@ -131,7 +131,7 @@ class UNet3(nn.Module):
 
 class UNet3Attention(nn.Module):
     def __init__(self, n_channels, n_classes):
-        super(UNet3, self).__init__()
+        super(UNet3Attention, self).__init__()
         self.inc = inconv(n_channels, 64)
         self.down1 = down_attention(64, 128)
         self.down2 = down_attention(128, 256)
@@ -223,7 +223,7 @@ def normal_init(m, mean, std):
 
 class UNet4Attention(nn.Module):
     def __init__(self, n_channels, n_classes):
-        super(UNet4, self).__init__()
+        super(UNet4Attention, self).__init__()
         self.inc = inconv(n_channels, 64)
         self.down1 = down_attention(64, 128)
         self.down2 = down_attention(128, 256)
