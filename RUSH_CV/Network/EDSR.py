@@ -51,7 +51,6 @@ class ResnetBlock(nn.Module):
         super(ResnetBlock, self).__init__()
         self.conv1 = nn.Conv2d(num_channel, num_channel, kernel, stride, padding)
         self.conv2 = nn.Conv2d(num_channel, num_channel, kernel, stride, padding)
-        self.bn = nn.BatchNorm2d(num_channel)
         self.activation = nn.ReLU(inplace=True)
 
     def forward(self, x):
@@ -105,7 +104,6 @@ class ResnetBlockAttention(nn.Module):
         super(ResnetBlockAttention, self).__init__()
         self.conv1 = nn.Conv2d(num_channel, num_channel, kernel, stride, padding)
         self.conv2 = nn.Conv2d(num_channel, num_channel, kernel, stride, padding)
-        # self.bn = nn.BatchNorm2d(num_channel)
         self.activation = nn.ReLU(inplace=True)
         self.channel_attention1 = ChannelAttention(num_channel, 8)
         self.channel_attention2 = ChannelAttention(num_channel, 8)
