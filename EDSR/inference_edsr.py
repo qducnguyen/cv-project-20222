@@ -2,10 +2,8 @@
 import sys
 sys.path.append(".")
 
-from torchvision.transforms import transforms
-from PIL import Image
-
-
+import numpy as np
+import cv2
 import os
 import argparse
 import logging
@@ -13,7 +11,6 @@ import torch
 
 from RUSH_CV.Network.EDSR import EDSR
 from RUSH_CV.utils import load_checkpoint
-
 
 pp = argparse.ArgumentParser(description="Inference")
 
@@ -23,34 +20,6 @@ pp.add_argument("--image_output_path", type=str, default="examples/sample_infere
 pp.add_argument("-s", "--scale", type=int, default=4)
 
 args = pp.parse_args()
-
-
-## Give one images -> return new images based on models (current is CNN), -> return HR imagew
-import sys
-sys.path.append(".")
-
-import yaml
-import os
-import argparse
-import logging
-import cv2
-import numpy as np
-import torch
-
-from RUSH_CV.Network.VDSR import VDSR
-from RUSH_CV.utils import load_checkpoint
-
-
-pp = argparse.ArgumentParser(description="Inference")
-
-pp.add_argument("--ckp_dir", type=str, default="./ckp/VDSR/")
-pp.add_argument("--image_input_path", type=str, default="examples/sample_inference_01.jpg")
-pp.add_argument("--image_output_path", type=str, default="examples/sample_inference_01_test.png")
-pp.add_argument("-s", "--scale", type=int, default=4)
-
-args = pp.parse_args()
-
-
 
 def main():
 
