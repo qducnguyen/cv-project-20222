@@ -5,11 +5,13 @@ import torch.nn.functional as F
 
 from .attention import ChannelAttention, SpatialAttention
 
-class one_conv(nn.Module):
+class double_conv(nn.Module):
     def __init__(self, in_ch, out_ch):
-        super(one_conv, self).__init__()
+        super(double_conv, self).__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(in_ch, out_ch, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_ch, out_ch, 3, padding=1),
             nn.ReLU(inplace=True)
         )
 
@@ -21,7 +23,7 @@ class one_conv(nn.Module):
 class inconv(nn.Module):
     def __init__(self, in_ch, out_ch):
         super(inconv, self).__init__()
-        self.conv = one_conv(in_ch, out_ch)
+        self.conv = double_conv(in_ch, out_ch)
 
     def forward(self, x):
         x = self.conv(x)
@@ -33,7 +35,7 @@ class down(nn.Module):
         super(down, self).__init__()
         self.mpconv = nn.Sequential(
             nn.MaxPool2d(2),
-            one_conv(in_ch, out_ch)
+            double_conv(in_ch, out_ch)
         )
 
     def forward(self, x):
@@ -47,7 +49,7 @@ class down_attention(nn.Module):
         super(down_attention, self).__init__()
         self.mpconv = nn.Sequential(
             nn.MaxPool2d(2),
-            one_conv(in_ch, out_ch)
+            double_conv(in_ch, out_ch)
         )
 
         self.channel_attention = ChannelAttention(out_ch, 8)
@@ -72,7 +74,7 @@ class up(nn.Module):
         else:
             self.up = nn.ConvTranspose2d(in_ch//2, in_ch//2, 2, stride=2)
 
-        self.conv = one_conv(in_ch, out_ch)
+        self.conv = double_conv(in_ch, out_ch)
 
     def forward(self, x1, x2):
         x1 = self.up(x1)
@@ -103,14 +105,13 @@ class outconv(nn.Module):
         return x
 
 
-
 class up_s(nn.Module):
     def __init__(self, in_ch, out_ch, up_size=2):
         super(up_s, self).__init__()
         self.upconv = nn.Sequential(
             #nn.Upsample(scale_factor=2, mode='bilinear',align_corners=True),
             nn.ConvTranspose2d(in_ch, in_ch, up_size, stride=up_size),
-            one_conv(in_ch, out_ch)
+            double_conv(in_ch, out_ch)
         )
 
 
@@ -126,7 +127,7 @@ class up_s_attention(nn.Module):
         self.upconv = nn.Sequential(
             #nn.Upsample(scale_factor=2, mode='bilinear',align_corners=True),
             nn.ConvTranspose2d(in_ch, in_ch, up_size, stride=up_size),
-            one_conv(in_ch, out_ch)
+            double_conv(in_ch, out_ch)
         )  
 
         self.channel_attention = ChannelAttention(out_ch, 8)
