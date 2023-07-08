@@ -9,7 +9,9 @@ import argparse
 import logging
 import torch
 
-from RUSH_CV.Network.EDSR import EDSR
+from utils import str2bool
+
+from RUSH_CV.Network.EDSR import EDSR, EDSRAttention
 from RUSH_CV.utils import load_checkpoint
 
 
@@ -33,8 +35,11 @@ def main(args):
     img_tensor.mul_(1.0 / 255)
 
     logging.debug("Loading model ...")
-    network = EDSR(num_channels=3, base_channel=64, num_residuals=16, upscale_factor=args.scale)
 
+    if args.attention:
+        network = EDSRAttention(num_channels=3, base_channel=64, num_residuals=16, upscale_factor=args.scale)
+    else:
+        network = EDSR(num_channels=3, base_channel=64, num_residuals=16, upscale_factor=args.scale)
     load_checkpoint(os.path.join(args.ckp_dir, "best.pth"), network)
 
     logging.debug("Predicting ...")
@@ -56,6 +61,7 @@ if __name__ == "__main__":
     pp.add_argument("--image_input_path", type=str, default="examples/sample_inference_01.jpg")
     pp.add_argument("--image_output_path", type=str, default="examples/sample_inference_01_test.png")
     pp.add_argument("-s", "--scale", type=int, default=4)
+    pp.add_argument("--attention", "-a", type=str2bool, default=False)
 
     args = pp.parse_args()
 

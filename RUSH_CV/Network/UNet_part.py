@@ -113,9 +113,29 @@ class up_s(nn.Module):
             one_conv(in_ch, out_ch)
         )
 
+
     def forward(self, x):
         x = self.upconv(x)
         return x
+    
 
+class up_s_attention(nn.Module):
+
+    def __init__(self, in_ch, out_ch, up_size=2):
+        super(up_s_attention, self).__init__()
+        self.upconv = nn.Sequential(
+            #nn.Upsample(scale_factor=2, mode='bilinear',align_corners=True),
+            nn.ConvTranspose2d(in_ch, in_ch, up_size, stride=up_size),
+            one_conv(in_ch, out_ch)
+        )  
+
+        self.channel_attention = ChannelAttention(out_ch, 8)
+        self.spatial_attention = SpatialAttention(7)
+
+    def forward(self, x):
+        x = self.upconv(x)
+        x = self.channel_attention(x)
+        x = self.spatial_attention(x)
+        return x
         
 

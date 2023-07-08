@@ -1,8 +1,5 @@
 import torch
 import torch.nn as nn
-import matplotlib.pyplot as plt
-import torch.nn.functional as F
-import numpy as np
 
 from .UNet_part import *
 
@@ -63,7 +60,7 @@ class UNet2Attention(nn.Module):
 
         self.outc = outconv(32, n_classes)
 
-        self.up_s1=up_s(64,32)
+        self.up_s1= up_s_attention(64,32)
 
     def forward(self, x):
         x1 = self.inc(x)
@@ -146,7 +143,7 @@ class UNet3Attention(nn.Module):
 
         self.outc = outconv(32, n_classes)
 
-        self.up_s1=up_s(64,32, 3)
+        self.up_s1=up_s_attention(64,32, 3)
 
     def forward(self, x):
         x1 = self.inc(x)
@@ -237,8 +234,8 @@ class UNet4Attention(nn.Module):
         self.up6 = up(32, 16,bilinear=False)
         self.outc = outconv(16, n_classes)#64
 
-        self.up_s1=up_s(64,32)
-        self.up_s2=up_s(32,16)
+        self.up_s1=up_s_attention(64,32)
+        self.up_s2=up_s_attention(32,16)
 
 
     def forward(self, xs):

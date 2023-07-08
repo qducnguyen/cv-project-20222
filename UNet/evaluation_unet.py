@@ -114,7 +114,7 @@ def main(args):
 
     with torch.no_grad():
         with tqdm(total=len(test_dataloader)) as t:
-            for idx, data, target in tqdm(test_dataloader):
+            for idx, data, target in test_dataloader:
 
                 lr = data.to(device)
                 hr = target.to(device)
