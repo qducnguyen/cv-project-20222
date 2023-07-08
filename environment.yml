@@ -1,4 +1,4 @@
-name: D:\miniconda-env\cv-env
+name: cv-env
 channels:
   - defaults
 dependencies:
