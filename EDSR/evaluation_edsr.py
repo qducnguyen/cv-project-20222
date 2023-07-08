@@ -7,10 +7,12 @@ import argparse
 import logging
 import torch
 
+from utils import str2bool
+
 from RUSH_CV.utils import seed_everything
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
-from RUSH_CV.Network.EDSR import EDSR
+from RUSH_CV.Network.EDSR import EDSR, EDSRAttention
 from RUSH_CV.Loss.L1Loss import L1Loss
 from RUSH_CV.Evaluation.PSNR import PSNR
 from RUSH_CV.Evaluation.SSIM import SSIM
@@ -52,7 +54,10 @@ def main(args):
                                   drop_last=False)
 
     # Network
-    network = EDSR(num_channels=3, base_channel=64, num_residuals=16, upscale_factor=args.scale)
+    if args.attention:
+        network = EDSRAttention(num_channels=3, base_channel=64, num_residuals=16, upscale_factor=args.scale)
+    else:
+        network = EDSR(num_channels=3, base_channel=64, num_residuals=16, upscale_factor=args.scale)
     criterion = L1Loss()
 
     # Loss
@@ -98,6 +103,7 @@ if __name__ == '__main__':
 
     pp.add_argument("--ckp_dir", type=str, default="./ckp/")
     pp.add_argument("--scale", type=int, default=4)
+    pp.add_argument("--attention", "-a", type=str2bool, default=False)
 
     args = pp.parse_args()
 

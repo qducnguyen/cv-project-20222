@@ -9,8 +9,9 @@ import logging
 import cv2
 import numpy as np
 import torch
+from utils import str2bool
 
-from RUSH_CV.Network.VDSR import VDSR
+from RUSH_CV.Network.VDSR import VDSR, VDSRAttention
 from RUSH_CV.utils import load_checkpoint
 
 
@@ -36,7 +37,12 @@ def main(args):
     img_tensor.mul_(1.0 / 255)
 
     logging.debug("Loading model ...")
-    network = VDSR(num_channels=3, base_channels=64, num_residuals=18)
+    
+    if args.attention:
+        network = VDSRAttention(num_channels=3, base_channels=64, num_residuals=18)
+    else:
+        network = VDSR(num_channels=3, base_channels=64, num_residuals=18)
+
     load_checkpoint(os.path.join(ckp_dir, "best.pth"), network)
 
     logging.debug("Predicting ...")
@@ -59,6 +65,8 @@ if __name__ == "__main__":
     pp.add_argument("--image_input_path", type=str, default="examples/sample_inference_01.jpg")
     pp.add_argument("--image_output_path", type=str, default="examples/sample_inference_01_test.png")
     pp.add_argument("-s", "--scale", type=int, default=4)
+    pp.add_argument("-a", "--attention", type=str2bool, default=False)
+
 
     args = pp.parse_args()
 
