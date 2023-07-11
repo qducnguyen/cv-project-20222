@@ -51,6 +51,6 @@ https://colab.research.google.com/drive/1FUUh2Sav1IhfKmKPvRKROXAq_9bBBp6A?usp=sh
 - [x] Debug mode
 - [x] Training, Inference, Evaluation
 - [x] Colab notebook illustration
-- [x] Deployment in here?
+- [] Deployment Link
 
 

@@ -51,13 +51,13 @@ def main(args):
     network.to(device)
     network.eval()
 
-
     logging.debug("Predicting ...")
     
     start_time_2 = time.time()
     with torch.no_grad():
         img_tensor = img_tensor.unsqueeze(0).to(device)
-        result_np = network(img_tensor).clamp(0.0, 1.0).cpu().detach().numpy().squeeze()
+        result_tensor = network(img_tensor).clamp(0.0, 1.0)
+        result_np = result_tensor.cpu().detach().numpy().squeeze()
 
     result_img = cv2.cvtColor(result_np.transpose((1, 2, 0)), cv2.COLOR_RGB2BGR) * 255
 
@@ -71,15 +71,15 @@ def main(args):
         else:
             cv2_img_hr = cv2.imread(args.image_hr_input_path)
             cv2_img_hr = cv2.cvtColor(cv2_img_hr, cv2.COLOR_RGB2BGR)
-            cv2_img_hr_scale = cv2.resize(cv2_img_hr, None, fx=args.scale, fy=args.scale, interpolation=cv2.INTER_CUBIC)
-            img_transpose_hr = np.ascontiguousarray(cv2_img_hr_scale.transpose((2, 0, 1)))
+            img_transpose_hr = np.ascontiguousarray(cv2_img_hr.transpose((2, 0, 1)))
             img_tensor_hr = torch.from_numpy(img_transpose_hr).float()
             img_tensor_hr.mul_(1.0 / 255)
+            img_tensor_hr = img_tensor_hr.to(device).unsqueeze(0)
 
             psnr = PSNR()
-            psnr.update(img_tensor_hr, img_tensor)
+            psnr.update(img_tensor_hr, result_tensor)
             ssim = SSIM()
-            ssim.update(img_tensor_hr, img_tensor)
+            ssim.update(img_tensor_hr, result_tensor)
             logging.info(f"PSNR: {psnr():.3f}, SSIM: {ssim():.3f}")
             return psnr, ssim
 
