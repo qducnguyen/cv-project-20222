@@ -9,7 +9,7 @@ class UNetTrainer():
     def run(self):
         training_main(args=self.args)
 
-class UnetEvaluator():
+class UNetEvaluator():
     def __init__(self, args):
         self.args = args
     

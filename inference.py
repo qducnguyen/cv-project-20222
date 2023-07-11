@@ -20,7 +20,10 @@ parser.add_argument("--ckp_dir", type=str, default="./ckp/")
 parser.add_argument('--scale', '-s',  type=int, default=4, help="Super Resolution upscale factor")
 parser.add_argument("--image_input_path", "-in", type=str, default="examples/sample_inference_01.jpg")
 parser.add_argument("--image_output_path", "-out", type=str, default="examples/sample_inference_01_test.png")
+parser.add_argument("--image_hr_input_path", "-in_hr", type=str, default=None)
+parser.add_argument("--metric", type=str2bool, default=False)
 parser.add_argument('--attention', '-a', type=str2bool, default=False, help="Attention or Not, skip for bicubic")
+
 
 # hyper-parameters
 args = parser.parse_args()

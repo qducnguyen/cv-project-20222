@@ -6,7 +6,7 @@ from SRCNN.solver import SRCNNEvaluator
 from VDSR.solver import VDSREvaluator
 from EDSR.solver import EDSREvaluator
 from SRGAN.solver import SRGANEvaluator
-from UNet.solver import UnetEvaluator
+from UNet.solver import UNetEvaluator
 
 # ===========================================================
 # Evaluatoin settings
@@ -35,7 +35,7 @@ def main():
     elif args.model == "srgan":
         evaluator = SRGANEvaluator(args)
     elif args.model == "unet":
-        evaluator = UnetEvaluator(args)
+        evaluator = UNetEvaluator(args)
     else:
         raise Exception("The model does not exist")    
     
