@@ -50,7 +50,7 @@ def get_example(img_name, scale_factor, x, y, crop_size):
 
 
 default_images = get_example("Image 1", "x4", "700", "550", "150")
-
+print(len(default_images))
 
 def generate(input, m, s, progress=gr.Progress(track_tqdm=True)):
     try:
@@ -120,9 +120,10 @@ with gr.Blocks(css=css, theme=gr.themes.Soft()) as app:
             
             # x = gr.Textbox(value=500, label="X", placeholder="x-position of selected area")
             # y = gr.Textbox(value=500, label="Y", placeholder="y-position of selected area")
-            x = gr.Slider(min_width=0, maximum=default_images[0].shape[0], value=700)
-            y = gr.Slider(min_width=0, maximum=default_images[0].shape[1], value=550)
-            r = gr.Slider(min_width=50, maximum=300, value=150)
+            y = gr.Slider(min_width=0, maximum=default_images[0].shape[1], value=550, label="X")
+            x = gr.Slider(min_width=0, maximum=default_images[0].shape[0], value=700, label="Y")
+            
+            r = gr.Slider(min_width=50, maximum=300, value=150, label="Crop size")
         with gr.Row():
             with gr.Column(scale=4):
                 # gr.Markdown("Full image")
