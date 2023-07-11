@@ -40,9 +40,9 @@ conda activate cv-env
 
 
 ## For Dataset Preparation and Training Code, the following Google Colab provides instruction on how to run the code.
-
+```
 https://colab.research.google.com/drive/1FUUh2Sav1IhfKmKPvRKROXAq_9bBBp6A?usp=sharing
-
+```
 
 ## Team Members
 
@@ -57,11 +57,18 @@ https://colab.research.google.com/drive/1FUUh2Sav1IhfKmKPvRKROXAq_9bBBp6A?usp=sh
 ---
 ## Temporary Deployment Website
 
+```
 https://qducnguyen.github.io/cvdemo/
-
-
+```
 
 ---
+
+
+## Misc
+
+- Source code for SISR: https://github.com/duclh19/SISR-sparse-representation
+
+
 
 ## Todo
 
