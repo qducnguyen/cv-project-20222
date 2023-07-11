@@ -8,6 +8,7 @@ import os
 import argparse
 import logging
 import torch
+import time
 
 from utils import str2bool
 
@@ -20,7 +21,7 @@ def main(args):
 
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
-    ckp_dir = os.path.join(args.ckp_dir,  "EDSR", "x" + str(args.scale))
+    ckp_dir = os.path.join(args.ckp_dir,  "att" if args.attention else "no-att" , "EDSR", "x" + str(args.scale))
 
     logging.debug("Detecting device ...")
     if torch.cuda.is_available():
@@ -29,10 +30,16 @@ def main(args):
         device = torch.device("cpu")
 
     logging.debug("Processing input image ...")
-    cv2_img = cv2.cvtColor(cv2.imread(args.image_input_path), cv2.COLOR_RGB2BGR)
+    
+    cv2_img = cv2.imread(args.image_input_path)
+    start_time_1 = time.time()
+
+    cv2_img = cv2.cvtColor(cv2_img, cv2.COLOR_RGB2BGR)
     img_transpose = np.ascontiguousarray(cv2_img.transpose((2, 0, 1)))
     img_tensor = torch.from_numpy(img_transpose).float()
     img_tensor.mul_(1.0 / 255)
+
+    end_time_1 = time.time()
 
     logging.debug("Loading model ...")
 
@@ -40,18 +47,25 @@ def main(args):
         network = EDSRAttention(num_channels=3, base_channel=64, num_residuals=16, upscale_factor=args.scale)
     else:
         network = EDSR(num_channels=3, base_channel=64, num_residuals=16, upscale_factor=args.scale)
-    load_checkpoint(os.path.join(args.ckp_dir, "best.pth"), network)
+    load_checkpoint(os.path.join(ckp_dir, "best.pth"), network)
+    network.to(device)
+    network.eval()
+
+
 
     logging.debug("Predicting ...")
+    start_time_2 = time.time()
+
     with torch.no_grad():
         img_tensor = img_tensor.unsqueeze(0).to(device)
-        network.to(device)
-        network.eval()
         result_np = network(img_tensor).cpu().detach().numpy().squeeze()
 
     result_img = cv2.cvtColor(result_np.transpose((1, 2, 0)), cv2.COLOR_RGB2BGR) * 255
+
+    time_interval = time.time() - start_time_2 + end_time_1 - start_time_1
+
     cv2.imwrite(args.image_output_path, result_img)
-    logging.info(f"Output image shape of {result_img.shape} stored at {args.image_output_path}")
+    logging.info(f"Output image shape of {result_img.shape} stored at {args.image_output_path} in {time_interval:.3f}")
 
 if __name__ == "__main__":
 

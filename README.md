@@ -1,4 +1,4 @@
-# Computer Vision Project: Super-resolution with Flowers Images
+# Computer Vision Project: Single Image Super-resolution with Flower Images
 # DSAI K65 - HUST
 
 **Note: All the code need to run in this directory.* 
@@ -8,7 +8,13 @@
 ---
 ## Overview
 
-....
+We implement different algorithms and models for Single Image Super-resolution with Flower Images 
+
+For Bicubic, 
+
+
+
+
 
 ---
 

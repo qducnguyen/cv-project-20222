@@ -32,6 +32,8 @@ def to_device(X, device):
 
     return X.to(device, non_blocking=True)
 
+def count_parameters(model):
+    return sum(param.numel() for param in model.parameters())
 
 
 class RunningAverage():

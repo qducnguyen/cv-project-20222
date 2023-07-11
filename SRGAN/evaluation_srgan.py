@@ -9,7 +9,7 @@ import torch
 
 from utils import str2bool
 from tqdm.auto import tqdm
-from RUSH_CV.utils import seed_everything
+from RUSH_CV.utils import seed_everything, count_parameters
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
 from RUSH_CV.Network.SRGAN import Generator, GeneratorAttention
@@ -24,7 +24,7 @@ def main(args):
 
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
-    ckp_dir = os.path.join(args.ckp_dir,  "SRGAN", "x" + str(args.scale))
+    ckp_dir = os.path.join(args.ckp_dir, "att" if args.attention else "no-att"  ,"SRGAN", "x" + str(args.scale))
 
     
     valid_dataset = PexelsFlowers(data_np_path=f'data/preprocess/pexels_flowers_valid_x{args.scale}.npy',
@@ -58,6 +58,9 @@ def main(args):
     networkG.to(device)
 
     load_checkpoint(os.path.join(ckp_dir, "best.pth"), networkG)
+
+    logging.info("There are total of " + str(count_parameters(networkG)) + " parameters.")
+
 
     test_evaluation = {"PSNR": PSNR(), "SSIM":SSIM()} 
 

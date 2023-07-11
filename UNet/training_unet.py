@@ -32,7 +32,7 @@ def main(args):
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 
-    ckp_dir = os.path.join(args.ckp_dir,  "UNet", "x" + str(args.scale))
+    ckp_dir = os.path.join(args.ckp_dir, "att" if args.attention else "no-att" ,"UNet", "x" + str(args.scale))
 
 
     # Data
