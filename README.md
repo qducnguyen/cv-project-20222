@@ -20,7 +20,7 @@ We design new novel [Pexels Flowers](https://www.kaggle.com/datasets/alas123dc/p
 
 
 <span class="img_container center" style="display: block;">
-    <img alt="test" src="examples/github/0184x4-attention-figure.png" style="display:block; margin-left: auto; margin-right: auto;" title="caption" />
+    <img alt="test" src="examples/github/0973x4-attention-figure.png" style="display:block; margin-left: auto; margin-right: auto;" title="caption" />
     <span class="img_caption" style="display: block; text-align: center;">EDSR vs. EDSR attention with scale factor x4</span>
 </span>
 
@@ -68,6 +68,11 @@ https://qducnguyen.github.io/cvdemo/
 
 - Source code for SISR: https://github.com/duclh19/SISR-sparse-representation
 
+- Source code for Diffusion Model: https://github.com/TranafLee/SR3
+
+- Source code for Crawling Data from Pexels: https://drive.google.com/drive/folders/1xLSdbiMBpqyv80IRCwhQX-OvEseCi2HB?usp=sharing
+
+- Source code for Deployment on Google Colab: https://colab.research.google.com/drive/1FiY1Xx_AgDFPgd9YSeE1ACy4vI0zEbOd?usp=sharing
 
 
 ## Todo
