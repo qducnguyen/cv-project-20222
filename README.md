@@ -1,14 +1,29 @@
 # Computer Vision Project: Single Image Super-resolution with Flower Images
 # DSAI K65 - HUST
 
-**Note: All the code need to run in this directory.* 
-
-*All the code should be run on one of three platforms Linux OS, Google Colab, and Kaggle to work properly.*
-
 ---
 ## Overview
 
-We implement different algorithms and models for Single Image Super-resolution with Flower Images 
+We design new novel [Pexels Flowers](https://www.kaggle.com/datasets/alas123dc/pexels-flowers-dataset-official) dataset implement different algorithms and models for Single Image Super-resolution with Flower Images.
+
+
+
+
+<span class="img_container center" style="display: block;">
+    <img alt="test" src="examples/github/0184x4-figure.png" style="display:block; margin-left: auto; margin-right: auto;" title="caption" />
+    <span class="img_caption" style="display: block; text-align: center;">Super-resolution results of "0184" test image (Pexels Flowers) with scale factor x4</span>
+</span>
+
+</br>
+</br>
+
+
+
+<span class="img_container center" style="display: block;">
+    <img alt="test" src="examples/github/0184x4-attention-figure.png" style="display:block; margin-left: auto; margin-right: auto;" title="caption" />
+    <span class="img_caption" style="display: block; text-align: center;">EDSR vs. EDSR attention with scale factor x4</span>
+</span>
+
 
 ---
 
@@ -25,7 +40,7 @@ conda activate cv-env
 
 
 
-## Dataset Preparation and Training Code, you could see the tutorial in the head of each file or through Google Colab
+## For Dataset Preparation and Training Code, the following Google Colab provides instruction on how to run the code.
 
 ```
 https://colab.research.google.com/drive/1FUUh2Sav1IhfKmKPvRKROXAq_9bBBp6A?usp=sharing
@@ -51,6 +66,9 @@ https://colab.research.google.com/drive/1FUUh2Sav1IhfKmKPvRKROXAq_9bBBp6A?usp=sh
 - [x] Debug mode
 - [x] Training, Inference, Evaluation
 - [x] Colab notebook illustration
-- [] Deployment Link
+- [x] Deployment Link
 
 
+**Note: All the code need to run in this directory.* 
+
+*All the code should be run on one of three platforms Linux OS, Google Colab, and Kaggle to work properly.*
