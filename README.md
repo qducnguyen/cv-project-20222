@@ -24,7 +24,6 @@ We design new novel [Pexels Flowers](https://www.kaggle.com/datasets/alas123dc/p
     <span class="img_caption" style="display: block; text-align: center;">EDSR vs. EDSR attention with scale factor x4</span>
 </span>
 
-
 ---
 
 ## Environment Setup
@@ -42,9 +41,8 @@ conda activate cv-env
 
 ## For Dataset Preparation and Training Code, the following Google Colab provides instruction on how to run the code.
 
-```
 https://colab.research.google.com/drive/1FUUh2Sav1IhfKmKPvRKROXAq_9bBBp6A?usp=sharing
-```
+
 
 ## Team Members
 
@@ -57,6 +55,14 @@ https://colab.research.google.com/drive/1FUUh2Sav1IhfKmKPvRKROXAq_9bBBp6A?usp=sh
 | 4   | Luu Trong Nghia       | 20204888      |https://github.com/nghialt0205 |
 
 ---
+## Temporary Deployment Website
+
+https://qducnguyen.github.io/cvdemo/
+
+
+
+---
+
 ## Todo
 
 - [x] RUSH_CV framework
@@ -68,7 +74,10 @@ https://colab.research.google.com/drive/1FUUh2Sav1IhfKmKPvRKROXAq_9bBBp6A?usp=sh
 - [x] Colab notebook illustration
 - [x] Deployment Link
 
+---
 
 **Note: All the code need to run in this directory.* 
 
 *All the code should be run on one of three platforms Linux OS, Google Colab, and Kaggle to work properly.*
+
+*For any information, please contact me at ducnq.204876@sis.hust.edu.vn*
