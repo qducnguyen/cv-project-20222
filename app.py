@@ -185,7 +185,6 @@ with gr.Blocks(css=css, theme=gr.themes.Soft()) as app:
         size_selection.change(get_example, inputs=[img_selection, size_selection, x, y, r], outputs=[org_hr, lr, bicubic, edsr, srcnn, srgan, unet, vdsr, hr])
         
         img_selection.change(update_params, inputs=[img_selection], outputs=[x, y, r])
-        size_selection.change(update_params, inputs=[img_selection], outputs=[x, y, r])
         
         x.release(update_crop_size, inputs=[img_selection, x, y], outputs=r)
         y.release(update_crop_size, inputs=[img_selection, x, y], outputs=r)
@@ -195,5 +194,5 @@ with gr.Blocks(css=css, theme=gr.themes.Soft()) as app:
         
 
 app.queue(concurrency_count=4)
-app.launch(server_port=8081)
+app.launch(server_port=8081, share=True)
 
