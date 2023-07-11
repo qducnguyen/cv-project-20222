@@ -106,7 +106,7 @@ def load_checkpoint(checkpoint, model, optimizer=None, scheduler=None):
 
     logging.info(f"Load checkpoint from {checkpoint}")
 
-    checkpoint = torch.load(checkpoint)
+    checkpoint = torch.load(checkpoint,  map_location=torch.device('cpu'))
 
     # Load model
     model.load_state_dict(checkpoint['state_dict'])  # maybe epoch as well
