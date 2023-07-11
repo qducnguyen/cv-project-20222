@@ -80,7 +80,7 @@ def main(args):
 
     trainer.load_checkpoint(os.path.join(ckp_dir, "best.pth"))
 
-    logging.info("There are total of " + count_parameters(network) + " parameters.")
+    logging.info("There are total of " + str(count_parameters(network)) + " parameters.")
 
 
     if trainer.device is  None:

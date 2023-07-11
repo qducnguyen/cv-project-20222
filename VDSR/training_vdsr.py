@@ -26,7 +26,7 @@ def main(args):
     # DEBUG: set logging
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
-    ckp_dir = os.path.join(args.ckp_dir,  "VDSR", "x" + str(args.scale))
+    ckp_dir = os.path.join(args.ckp_dir, "att" if args.attention else "no-att", "VDSR", "x" + str(args.scale))
 
 
     # Data

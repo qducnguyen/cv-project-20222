@@ -8,7 +8,7 @@ import logging
 import torch
 from utils import str2bool
 
-from RUSH_CV.utils import seed_everything
+from RUSH_CV.utils import seed_everything, count_parameters
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
 from RUSH_CV.Network.VDSR import VDSR, VDSRAttention
@@ -25,7 +25,7 @@ def main(args):
 
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
-    ckp_dir = os.path.join(args.ckp_dir, "VDSR", "x" + str(args.scale))
+    ckp_dir = os.path.join(args.ckp_dir, "att" if args.attention else "no-att", "VDSR", "x" + str(args.scale))
 
 
     valid_dataset = PexelsFlowers(f'data/preprocess/pexels_flowers_valid_x{args.scale}.npy',
@@ -78,6 +78,8 @@ def main(args):
     
 
     trainer.load_checkpoint(os.path.join(ckp_dir, "best.pth"))
+    logging.info("There are total of " + str(count_parameters(network)) + " parameters.")
+
 
     if trainer.device is  None:
         trainer.device = 'cpu'

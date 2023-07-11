@@ -10,6 +10,7 @@ import logging
 import torch
 from RUSH_CV.Network.UNet import UNet2, UNet4, UNet3, UNet2Attention, UNet3Attention, UNet4Attention
 from RUSH_CV.utils import load_checkpoint
+import time
 
 
 def main(args):
@@ -17,9 +18,8 @@ def main(args):
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 
-    ckp_dir = os.path.join(args.ckp_dir,  "UNet", "x" + str(args.scale))
+    ckp_dir = os.path.join(args.ckp_dir, "att" if args.attention else "no-att" ,"UNet", "x" + str(args.scale))
     
-
     logging.debug("Detecting device ...")
     if torch.cuda.is_available():
         device = torch.device("cuda:0")
@@ -27,10 +27,14 @@ def main(args):
         device = torch.device("cpu")
 
     logging.debug("Processing input image ...")
-    cv2_img = cv2.cvtColor(cv2.imread(args.image_input_path), cv2.COLOR_RGB2BGR)
+    cv2_img = cv2.imread(args.image_input_path)
+
+    start_time_1 = time.time()
+    cv2_img = cv2.cvtColor( cv2_img, cv2.COLOR_RGB2BGR)
     img_transpose = np.ascontiguousarray(cv2_img.transpose((2, 0, 1)))
     img_tensor = torch.from_numpy(img_transpose).float()
     img_tensor.mul_(1.0 / 255)
+    end_time_1 = time.time()
 
     logging.debug("Loading model ...")
     
@@ -49,19 +53,25 @@ def main(args):
         else:
             network = UNet4(3, 3)
 
-
     load_checkpoint(os.path.join(ckp_dir, "best.pth"), network)
+    network.to(device)
+    network.eval()
+
+
 
     logging.debug("Predicting ...")
+
+    start_time_2 = time.time()
     with torch.no_grad():
         img_tensor = img_tensor.unsqueeze(0).to(device)
-        network.to(device)
-        network.eval()
         result_np = network(img_tensor).cpu().detach().numpy().squeeze()
 
     result_img = cv2.cvtColor(result_np.transpose((1, 2, 0)), cv2.COLOR_RGB2BGR) * 255
+
+    time_interval = time.time() - start_time_2 + end_time_1 - start_time_1
     cv2.imwrite(args.image_output_path, result_img)
-    logging.info(f"Output image shape of {result_img.shape} stored at {args.image_output_path}")
+    logging.info(f"Output image shape of {result_img.shape} stored at {args.image_output_path} in {time_interval:.3f}")
+
 
 
 

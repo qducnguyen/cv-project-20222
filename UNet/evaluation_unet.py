@@ -10,7 +10,7 @@ import torch
 from tqdm.auto import tqdm
 from utils import str2bool
 
-from RUSH_CV.utils import seed_everything
+from RUSH_CV.utils import seed_everything, count_parameters
 from RUSH_CV.Dataset.PexelsFlowers import PexelsFlowers
 from RUSH_CV.DataLoader.DataLoader import DataLoader
 from RUSH_CV.Network.UNet import UNet2, UNet4, UNet3, UNet2Attention, UNet3Attention, UNet4Attention
@@ -26,7 +26,7 @@ def main(args):
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 
-    ckp_dir = os.path.join(args.ckp_dir,  "UNet", "x" + str(args.scale))
+    ckp_dir = os.path.join(args.ckp_dir, "att" if args.attention else "no-att" ,"UNet", "x" + str(args.scale))
 
 
     
@@ -73,6 +73,7 @@ def main(args):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     network.to(device)
     load_checkpoint(os.path.join(ckp_dir, "best.pth"), network)
+    logging.info("There are total of " + str(count_parameters(network)) + " parameters.")
 
     test_evaluation = {"PSNR": PSNR(), "SSIM":SSIM()} 
 
