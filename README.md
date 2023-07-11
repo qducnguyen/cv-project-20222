@@ -10,12 +10,6 @@
 
 We implement different algorithms and models for Single Image Super-resolution with Flower Images 
 
-For Bicubic, 
-
-
-
-
-
 ---
 
 ## Environment Setup
@@ -31,18 +25,11 @@ conda activate cv-env
 
 
 
-## Project Structure 
+## Dataset Preparation and Training Code, you could see the tutorial in the head of each file or through Google Colab
 
 ```
-README.md               
-
+https://colab.research.google.com/drive/1FUUh2Sav1IhfKmKPvRKROXAq_9bBBp6A?usp=sharing
 ```
-*For more details, please read the README.md in each sub-directory and argparse in each file.*
-
----
-
-## Dataset Preparation 
-
 
 ## Team Members
 
@@ -63,9 +50,7 @@ README.md
 - [x] Model Class
 - [x] Debug mode
 - [x] Training, Inference, Evaluation
-- [] How to run data preparation 
-- [] How to run code 
-- [] Deployment in here?
-- [] Colab notebook illustration
+- [x] Colab notebook illustration
+- [] Deployment Link
 
 

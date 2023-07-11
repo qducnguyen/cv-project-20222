@@ -21,4 +21,4 @@ class VDSRInferencer():
         self.args = args
     
     def run(self):
-        inference_main(args=self.args)
+        return inference_main(args=self.args)
