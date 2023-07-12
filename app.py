@@ -14,6 +14,8 @@ from UNet.solver import UNetInferencer
 import random
 import traceback
 
+MIN_CROP_SIZE = 50
+MAX_CROP_SIZE = 300
 
 size = ["x2", "x3", "x4"]
 method = ["Bicubic", "SRCNN", "VDSR", "EDSR", "SRGAN", "SRU-NET"]
@@ -102,7 +104,7 @@ def update_params(img_name):
     path = f"image/examples/{img_name}.png"
     cur_img = cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)
 
-    return gr.update(min_width=0, maximum=cur_img.shape[0]), gr.update(min_width=0, maximum=cur_img.shape[0]), gr.update(min_width=50, maximum=300)
+    return gr.update(min_width=0, maximum=cur_img.shape[0]-MIN_CROP_SIZE), gr.update(min_width=0, maximum=cur_img.shape[0]-MIN_CROP_SIZE), gr.update(min_width=MIN_CROP_SIZE, maximum=MAX_CROP_SIZE)
     
 
 def update_crop_size(img_name, x, y):
@@ -111,7 +113,7 @@ def update_crop_size(img_name, x, y):
     cur_img = cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)
 
     new_max = min(cur_img.shape[0] - int(x), cur_img.shape[1] - int(y))
-    return gr.update(min_width=50, maximum=new_max, value=50 if new_max < 150 else 150)
+    return gr.update(min_width=MIN_CROP_SIZE, maximum=new_max, value=50 if new_max < 150 else 150)
 
 with gr.Blocks(css=css, theme=gr.themes.Soft()) as app:
     
