@@ -14,8 +14,9 @@ from UNet.solver import UNetInferencer
 import random
 import traceback
 
-MIN_CROP_SIZE = 50
-MAX_CROP_SIZE = 300
+MIN_CROP_SIZE = 25
+MAX_CROP_SIZE = 250
+MAX_INPUT_SIZE = 1073
 
 size = ["x2", "x3", "x4"]
 method = ["Bicubic", "SRCNN", "VDSR", "EDSR", "SRGAN", "SRU-NET"]
@@ -38,7 +39,8 @@ def get_example(img_name, scale_factor, x, y, crop_size):
 
     # print(sorted(images_path))
     org_hr = cv2.cvtColor(cv2.imread(hr_path), cv2.COLOR_BGR2RGB)
-    org_lr = cv2.cvtColor(cv2.imread(lr_path), cv2.COLOR_BGR2RGB)[x//scale_factor:(x+crop_size)//scale_factor, y//scale_factor:(y+crop_size)//scale_factor]
+    lr_crop_size = crop_size//scale_factor
+    org_lr = cv2.cvtColor(cv2.imread(lr_path), cv2.COLOR_BGR2RGB)[x//scale_factor:lr_crop_size + x//scale_factor, y//scale_factor:lr_crop_size + y//scale_factor]
 
     hr = org_hr.copy()[x:x+crop_size, y:y+crop_size]
     start_point = (y, x)
@@ -54,7 +56,7 @@ def get_example(img_name, scale_factor, x, y, crop_size):
 
 
 default_images = get_example("Image 1", "x4", "700", "550", "150")
-print(len(default_images))
+# print(len(default_images))
 
 def generate(input, m, s, progress=gr.Progress(track_tqdm=True)):
     try:
@@ -103,8 +105,7 @@ def update_params(img_name):
     img_name = images[img_name]
     path = f"image/examples/{img_name}.png"
     cur_img = cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)
-
-    return gr.update(min_width=0, maximum=cur_img.shape[0]-MIN_CROP_SIZE), gr.update(min_width=0, maximum=cur_img.shape[0]-MIN_CROP_SIZE), gr.update(min_width=MIN_CROP_SIZE, maximum=MAX_CROP_SIZE)
+    return gr.update(min_width=0, maximum=cur_img.shape[0]-MIN_CROP_SIZE), gr.update(min_width=0, maximum=cur_img.shape[1]-MIN_CROP_SIZE), gr.update(min_width=MIN_CROP_SIZE, maximum=MAX_CROP_SIZE)
     
 
 def update_crop_size(img_name, x, y):
@@ -112,22 +113,34 @@ def update_crop_size(img_name, x, y):
     path = f"image/examples/{img_name}.png"
     cur_img = cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)
 
-    new_max = min(cur_img.shape[0] - int(x), cur_img.shape[1] - int(y))
-    return gr.update(min_width=MIN_CROP_SIZE, maximum=new_max, value=50 if new_max < 150 else 150)
+    new_max = min([cur_img.shape[0] - int(x), cur_img.shape[1] - int(y)])
+    new_value = value=MIN_CROP_SIZE if new_max < 150 else 150
+    return gr.update(min_width=MIN_CROP_SIZE, maximum=new_max, value=new_value)
 
-with gr.Blocks(css=css, theme=gr.themes.Soft()) as app:
+def check_input_size(input):
+    try:
+        cur_img = cv2.cvtColor(cv2.imread(input), cv2.COLOR_BGR2RGB)
+
+        max_size = max([cur_img.shape[0], cur_img.shape[1]])
+
+        if max_size < MAX_INPUT_SIZE:
+            return gr.update(value="Valid input! You can continue generating SR image"), gr.update(interactive=True)
+        else:
+            return gr.update(value="Invliad input! Your image may exceed our limit size (1073), please change you input!!"), gr.update(interactive=False)
+    except:
+        return gr.update(value="Upload the image you want to test"), gr.update(interactive=True)
+
+with gr.Blocks(css=css, theme=gr.themes.Soft(), title="Image Super Resolution") as app:
     
-    with gr.Tab("Result"):
+    with gr.Tab("Examples"):
         with gr.Row():
             img_selection = gr.Dropdown(choices=list(images.keys()),value=list(images.keys())[0], label="Image", elem_classes="dropdown")
             size_selection = gr.Dropdown(choices=size, value=size[0], label="SR size", elem_classes="dropdown")
             
-            # x = gr.Textbox(value=500, label="X", placeholder="x-position of selected area")
-            # y = gr.Textbox(value=500, label="Y", placeholder="y-position of selected area")
-            y = gr.Slider(min_width=0, maximum=default_images[0].shape[1], value=550, label="X")
-            x = gr.Slider(min_width=0, maximum=default_images[0].shape[0], value=700, label="Y")
+            y = gr.Slider(min_width=0, maximum=default_images[0].shape[1]-MIN_CROP_SIZE, value=550, label="X", step=5)
+            x = gr.Slider(min_width=0, maximum=default_images[0].shape[0]-MIN_CROP_SIZE, value=700, label="Y", step=5)
             
-            r = gr.Slider(min_width=50, maximum=300, value=150, label="Crop size")
+            r = gr.Slider(min_width=MIN_CROP_SIZE, maximum=MAX_CROP_SIZE, value=150, label="Crop size")
         with gr.Row():
             with gr.Column(scale=4):
                 # gr.Markdown("Full image")
@@ -142,7 +155,7 @@ with gr.Blocks(css=css, theme=gr.themes.Soft()) as app:
                         gr.Markdown("VDSR", elem_classes="label_img")
                     with gr.Column(min_width=70):
                         unet = gr.Image(value=default_images[6], show_label=False)
-                        gr.Markdown("UNET", elem_classes="label_img")
+                        gr.Markdown("SRU-NET", elem_classes="label_img")
                     with gr.Column(min_width=70):
                         bicubic = gr.Image(value=default_images[2], show_label=False)
                         gr.Markdown("Bicubic", elem_classes="label_img")
@@ -181,22 +194,17 @@ with gr.Blocks(css=css, theme=gr.themes.Soft()) as app:
             output_test = gr.Image(type="filepath")
             
         
-        # Button
-        submit.click(lambda x: gr.update(interactive=False), inputs=[submit], outputs=[submit])
-        submit.click(generate, inputs=[input, method_selection_test, size_selection_test], outputs=[output_test, submit, status])
+        input.change(check_input_size, inputs=input, outputs=[status, submit])
+        submit.click(lambda x: gr.update(interactive=False), inputs=[submit], outputs=[submit]).then(generate, inputs=[input, method_selection_test, size_selection_test], outputs=[output_test, submit, status])
 
-        img_selection.change(get_example, inputs=[img_selection, size_selection, x, y, r], outputs=[org_hr, lr, bicubic, edsr, srcnn, srgan, unet, vdsr, hr])
+        img_selection.change(update_params, inputs=[img_selection], outputs=[x, y, r]).then(get_example, inputs=[img_selection, size_selection, x, y, r], outputs=[org_hr, lr, bicubic, edsr, srcnn, srgan, unet, vdsr, hr])
         size_selection.change(get_example, inputs=[img_selection, size_selection, x, y, r], outputs=[org_hr, lr, bicubic, edsr, srcnn, srgan, unet, vdsr, hr])
         
-        img_selection.change(update_params, inputs=[img_selection], outputs=[x, y, r])
-        
-        x.release(update_crop_size, inputs=[img_selection, x, y], outputs=r)
-        y.release(update_crop_size, inputs=[img_selection, x, y], outputs=r)
-        x.release(get_example, inputs=[img_selection, size_selection, x, y, r], outputs=[org_hr, lr, bicubic, edsr, srcnn, srgan, unet, vdsr, hr])
-        y.release(get_example, inputs=[img_selection, size_selection, x, y, r], outputs=[org_hr, lr, bicubic, edsr, srcnn, srgan, unet, vdsr, hr])
+        x.release(update_crop_size, inputs=[img_selection, x, y], outputs=r).then(get_example, inputs=[img_selection, size_selection, x, y, r], outputs=[org_hr, lr, bicubic, edsr, srcnn, srgan, unet, vdsr, hr])
+        y.release(update_crop_size, inputs=[img_selection, x, y], outputs=r).then(get_example, inputs=[img_selection, size_selection, x, y, r], outputs=[org_hr, lr, bicubic, edsr, srcnn, srgan, unet, vdsr, hr])
         r.release(get_example, inputs=[img_selection, size_selection, x, y, r], outputs=[org_hr, lr, bicubic, edsr, srcnn, srgan, unet, vdsr, hr])
         
 
-app.queue(concurrency_count=4)
-app.launch(server_port=8081, share=True)
+app.queue(concurrency_count=3)
+app.launch()
 
