@@ -16,7 +16,7 @@ import traceback
 
 
 size = ["x2", "x3", "x4"]
-method = ["Bicubic", "SRCNN", "VDSR", "EDSR", "SRGAN", "UNET"]
+method = ["Bicubic", "SRCNN", "VDSR", "EDSR", "SRGAN", "SRU-NET"]
 css = """
         #status {text-align: center !important}
         .label_img {text-align: center !important}
@@ -30,6 +30,8 @@ def get_example(img_name, scale_factor, x, y, crop_size):
     img_name = images[img_name]
     x, y, crop_size = int(x), int(y), int(crop_size)
     images_path = glob.glob(f'image/sr/{img_name}x{scale_factor}/*.png')
+    images_path.sort()
+
     lr_path, hr_path = f'image/examples/{img_name}x{scale_factor}.png', f"image/examples/{img_name}.png"
 
     # print(sorted(images_path))
@@ -82,7 +84,7 @@ def generate(input, m, s, progress=gr.Progress(track_tqdm=True)):
             inferencer = EDSRInferencer(args)
         elif args.model == "srgan":
             inferencer = SRGANInferencer(args)
-        elif args.model == "unet":
+        elif args.model == "sru-net":
             inferencer = UNetInferencer(args)
         else:
             print("No model found!")
