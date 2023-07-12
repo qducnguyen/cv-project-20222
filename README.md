@@ -52,7 +52,7 @@ https://colab.research.google.com/drive/1FUUh2Sav1IhfKmKPvRKROXAq_9bBBp6A?usp=sh
 | 2   | Le Hong Duc           | 20204874      |https://github.com/duclh19 |
 | 3   | Tran Le Phuong Thao   | 20200604      |https://github.com/TranafLee |
 | 4   | La Dai Lam            | 20204918      |https://github.com/ladailam382 |
-| 4   | Luu Trong Nghia       | 20204888      |https://github.com/nghialt0205 |
+| 5   | Luu Trong Nghia       | 20204888      |https://github.com/nghialt0205 |
 
 ---
 ## Temporary Deployment Website
