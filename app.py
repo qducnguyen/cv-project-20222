@@ -136,7 +136,7 @@ with gr.Blocks(css=css, theme=gr.themes.Soft()) as app:
                         lr = gr.Image(value=default_images[1], show_label=False)
                         gr.Markdown("LR", elem_classes="label_img")
                     with gr.Column(min_width=70):
-                        vdsr = gr.Image(value=default_images[8], show_label=False)
+                        vdsr = gr.Image(value=default_images[7], show_label=False)
                         gr.Markdown("VDSR", elem_classes="label_img")
                     with gr.Column(min_width=70):
                         unet = gr.Image(value=default_images[6], show_label=False)
@@ -146,7 +146,7 @@ with gr.Blocks(css=css, theme=gr.themes.Soft()) as app:
                         gr.Markdown("Bicubic", elem_classes="label_img")
                 with gr.Row():
                     with gr.Column(min_width=70):
-                        hr = gr.Image(value=default_images[7], show_label=False)
+                        hr = gr.Image(value=default_images[8], show_label=False)
                         gr.Markdown("HR", elem_classes="label_img")
                     with gr.Column(min_width=70):
                         edsr = gr.Image(value=default_images[3], show_label=False)
