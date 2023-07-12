@@ -9,7 +9,7 @@ from SRGAN.solver import SRGANEvaluator
 from UNet.solver import UNetEvaluator
 
 # ===========================================================
-# Evaluatoin settings
+# Evaluator settings
 # ===========================================================
 parser = argparse.ArgumentParser(description='RUSH20222 Super-resolution Evaluator')
 

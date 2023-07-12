@@ -9,7 +9,7 @@ from SRGAN.solver import SRGANTrainer
 from UNet.solver import UNetTrainer
 
 # ===========================================================
-# Evaluatoin settings
+# Training settings
 # ===========================================================
 parser = argparse.ArgumentParser(description='RUSH20222 Super-resolution Trainer')
 

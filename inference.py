@@ -10,7 +10,7 @@ from UNet.solver import UNetInferencer
 
 
 # ===========================================================
-# Evaluatoin settings
+# Inference settings
 # ===========================================================
 parser = argparse.ArgumentParser(description='RUSH20222 Super-resolution Inferencer')
 

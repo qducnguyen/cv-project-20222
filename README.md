@@ -4,7 +4,7 @@
 ---
 ## Overview
 
-We design new novel [Pexels Flowers](https://www.kaggle.com/datasets/alas123dc/pexels-flowers-dataset-official) dataset implement different algorithms and models for Single Image Super-resolution with Flower Images.
+We implement different algorithms and models for Single Image Super-resolution with Flower Images on a new novel [Pexels Flowers](https://www.kaggle.com/datasets/alas123dc/pexels-flowers-dataset-official) dataset.
 
 
 
@@ -66,6 +66,7 @@ https://qducnguyen.github.io/cvdemo/
 
 ## Misc
 
+
 - Source code for SISR: https://github.com/duclh19/SISR-sparse-representation
 
 - Source code for Diffusion Model: https://github.com/TranafLee/SR3
@@ -73,6 +74,8 @@ https://qducnguyen.github.io/cvdemo/
 - Source code for Crawling Data from Pexels: https://drive.google.com/drive/folders/1xLSdbiMBpqyv80IRCwhQX-OvEseCi2HB?usp=sharing
 
 - Source code for Deployment on Google Colab: https://colab.research.google.com/drive/1FiY1Xx_AgDFPgd9YSeE1ACy4vI0zEbOd?usp=sharing
+
+- Github Deployment branch: https://github.com/qducnguyen/cv-project-20222/tree/deployment
 
 
 ## Todo
